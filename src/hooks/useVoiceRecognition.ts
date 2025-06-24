@@ -1,5 +1,60 @@
 import { useState, useEffect, useCallback } from 'react';
 
+// Define the SpeechRecognition API interface
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onstart: () => void;
+  onend: () => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+}
+
+interface SpeechRecognitionEvent extends Event {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+  message: string;
+}
+
+interface SpeechRecognitionResultList {
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition: {
+      new (): SpeechRecognition;
+      prototype: SpeechRecognition;
+    };
+    webkitSpeechRecognition: {
+      new (): SpeechRecognition;
+      prototype: SpeechRecognition;
+    };
+  }
+}
+
 interface UseVoiceRecognitionReturn {
   isListening: boolean;
   transcript: string;
@@ -43,7 +98,7 @@ export const useVoiceRecognition = (initialLanguage: string = 'en-US'): UseVoice
     recognitionInstance.interimResults = true;
     recognitionInstance.lang = getRecognitionLanguage(language);
 
-    recognitionInstance.onresult = (event) => {
+    recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
       let finalTranscript = '';
       let confidence = 0;
 
@@ -63,8 +118,8 @@ export const useVoiceRecognition = (initialLanguage: string = 'en-US'): UseVoice
 
     recognitionInstance.onstart = () => setIsListening(true);
     recognitionInstance.onend = () => setIsListening(false);
-    recognitionInstance.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
+    recognitionInstance.onerror = (event: SpeechRecognitionErrorEvent) => {
+      console.error('Speech recognition error:', event.error, event.message);
       setIsListening(false);
     };
 
@@ -120,10 +175,5 @@ export const useVoiceRecognition = (initialLanguage: string = 'en-US'): UseVoice
   };
 };
 
-// Extend Window interface for TypeScript
-declare global {
-  interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
-  }
-}
+// Export the SpeechRecognition type for use in other files
+export type { SpeechRecognition };

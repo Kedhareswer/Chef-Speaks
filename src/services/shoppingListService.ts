@@ -22,12 +22,27 @@ export interface ShoppingList {
   updatedAt: string
 }
 
+// Helper function to ensure items are properly typed
+const ensureShoppingListItems = (items: unknown): ShoppingListItem[] => {
+  if (!Array.isArray(items)) return [];
+  
+  return items.map(item => ({
+    id: typeof item?.id === 'string' ? item.id : '',
+    ingredient: typeof item?.ingredient === 'string' ? item.ingredient : '',
+    quantity: typeof item?.quantity === 'number' ? item.quantity : 0,
+    unit: typeof item?.unit === 'string' ? item.unit : '',
+    checked: !!item?.checked,
+    recipeId: typeof item?.recipeId === 'string' ? item.recipeId : undefined,
+    recipeName: typeof item?.recipeName === 'string' ? item.recipeName : undefined
+  }));
+};
+
 // Convert database row to ShoppingList type
 const convertDbShoppingListToShoppingList = (dbList: ShoppingListRow): ShoppingList => ({
   id: dbList.id,
   userId: dbList.user_id,
   name: dbList.name,
-  items: Array.isArray(dbList.items) ? dbList.items as ShoppingListItem[] : [],
+  items: ensureShoppingListItems(dbList.items),
   createdAt: dbList.created_at,
   updatedAt: dbList.updated_at
 })

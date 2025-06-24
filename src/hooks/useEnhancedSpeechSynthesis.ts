@@ -86,7 +86,7 @@ export const useEnhancedSpeechSynthesis = (): UseEnhancedSpeechSynthesisReturn =
             URL.revokeObjectURL(audioUrl)
           }
           
-          audio.onerror = (event) => {
+          audio.onerror = () => {
             const errorMsg = `Audio playback failed: ${audio.error?.message || 'Unknown error'}`
             console.warn('Audio error, falling back to web speech:', errorMsg)
             setIsSpeaking(false)
@@ -105,7 +105,8 @@ export const useEnhancedSpeechSynthesis = (): UseEnhancedSpeechSynthesisReturn =
           try {
             await audio.play()
           } catch (playError) {
-            console.warn('Error playing audio, falling back to web speech:', playError)
+            const errorMsg = playError instanceof Error ? playError.message : 'Unknown error occurred during audio playback'
+            console.warn('Error playing audio, falling back to web speech:', errorMsg)
             setIsGenerating(false)
             setIsSpeaking(false)
             // Clean up
@@ -124,8 +125,10 @@ export const useEnhancedSpeechSynthesis = (): UseEnhancedSpeechSynthesisReturn =
         fallbackToWebSpeech(text, language)
       }
     } catch (error) {
-      const errorMsg = `Speech synthesis error: ${error.message}`
-      console.warn('Error in speech synthesis, falling back to web speech:', error)
+      const errorMsg = error instanceof Error 
+        ? `Speech synthesis error: ${error.message}`
+        : 'An unknown error occurred during speech synthesis'
+      console.warn('Error in speech synthesis, falling back to web speech:', errorMsg)
       setLastError(errorMsg)
       setIsGenerating(false)
       setIsSpeaking(false)
@@ -188,10 +191,12 @@ export const useEnhancedSpeechSynthesis = (): UseEnhancedSpeechSynthesisReturn =
 
         window.speechSynthesis.speak(utterance)
       }, 100)
-    } catch (error) {
-      const errorMsg = `Web speech fallback failed: ${error.message}`
-      console.error('Web speech fallback error:', error)
-      setLastError(errorMsg)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error 
+        ? `Web speech fallback failed: ${error.message}`
+        : 'An unknown error occurred during web speech fallback';
+      console.error('Web speech fallback error:', error);
+      setLastError(errorMessage);
     }
   }, [isWebSpeechSupported])
 

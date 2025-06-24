@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Plus, X, Check, Trash2, Edit3, Save, Calendar, ChefHat, AlertCircle } from 'lucide-react';
+import { ShoppingCart, Plus, X, Check, Trash2, Calendar, ChefHat, AlertCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { shoppingListService, ShoppingList, ShoppingListItem } from '../services/shoppingListService';
 import { mealPlanService } from '../services/mealPlanService';
@@ -16,7 +16,6 @@ export const ShoppingListView: React.FC<ShoppingListViewProps> = ({ isOpen, onCl
   const [loading, setLoading] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newListName, setNewListName] = useState('');
-  const [editingItem, setEditingItem] = useState<string | null>(null);
   const [newItemText, setNewItemText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);

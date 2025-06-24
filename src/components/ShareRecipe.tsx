@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Share2, Facebook, Twitter, MessageCircle, Mail, Link, Copy, Check } from 'lucide-react'
+import { Share2, Facebook, Twitter, MessageCircle, Mail, Copy, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Recipe } from '../types'
 import { useAuth } from '../hooks/useAuth'
@@ -164,7 +164,7 @@ export const ShareRecipe: React.FC<ShareRecipeProps> = ({ recipe, isOpen, onClos
         </div>
 
         {/* Native Share (if supported) */}
-        {navigator.share && (
+        {typeof window !== 'undefined' && 'share' in navigator && (
           <button
             onClick={handleNativeShare}
             className="w-full mb-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 px-4 rounded-2xl font-medium transition-all transform hover:scale-105 flex items-center justify-center gap-2"

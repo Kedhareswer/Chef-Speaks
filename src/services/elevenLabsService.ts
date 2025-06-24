@@ -55,7 +55,7 @@ class ElevenLabsService {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('elevenlabs-tts', {
+      const { error } = await supabase.functions.invoke('elevenlabs-tts', {
         body: {
           text: 'test',
           voice_id: 'EXAVITQu4vr4xnSDxMaL'
@@ -160,15 +160,16 @@ class ElevenLabsService {
       
       console.log(`Successfully generated audio: ${audioBlob.size} bytes`)
       return audioUrl
-    } catch (error) {
-      console.error('Error in generateSpeech:', error)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error('Error in generateSpeech:', errorMessage);
       
       // Mark as not configured if it's a service error
-      if (error.message?.includes('not configured') || error.message?.includes('API key')) {
-        this.isConfigured = false
+      if (errorMessage.includes('not configured') || errorMessage.includes('API key')) {
+        this.isConfigured = false;
       }
       
-      return null
+      return null;
     }
   }
 
@@ -236,6 +237,10 @@ class ElevenLabsService {
       const audioUrl = await this.generateSpeech(stepText, language, 'female', voiceId)
       if (audioUrl) {
         audioUrls.push(audioUrl)
+        // Add delay between steps if there are more steps to process
+        if (i < instructions.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, stepDelay));
+        }
       }
       
       // Small delay to avoid rate limiting

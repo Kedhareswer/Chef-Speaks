@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Clock, Users, ChefHat, Check, MessageCircle, ToggleLeft, ToggleRight, Activity, Share2 } from 'lucide-react';
+import { ArrowLeft, Clock, Users, ChefHat, Check, MessageCircle, Activity, Share2 } from 'lucide-react';
 import { Recipe } from '../types';
 import { CommentsSection } from './CommentsSection';
 import { NutritionInfo } from './NutritionInfo';

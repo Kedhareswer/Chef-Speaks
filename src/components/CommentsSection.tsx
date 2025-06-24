@@ -20,7 +20,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({ recipeId }) =>
   const [loading, setLoading] = useState(false);
 
   const { user } = useAuth();
-  const { speak, stop: stopSpeaking, isSpeaking } = useSpeechSynthesis();
+  const { speak, isSpeaking } = useSpeechSynthesis();
   const { isListening, transcript, startListening, stopListening, isSupported } = useVoiceRecognition();
 
   useEffect(() => {

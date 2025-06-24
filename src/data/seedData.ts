@@ -28,7 +28,7 @@ export const seedDatabase = async () => {
     }))
 
     // Use the service role key for seeding to bypass RLS
-    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.auth.getUser()
     
     // If no user is authenticated, we need to use a different approach
     // Insert recipes using RPC function or direct database access

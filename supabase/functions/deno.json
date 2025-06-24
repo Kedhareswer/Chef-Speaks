@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.window"],
+    "types": ["deno"]
+  },
+  "imports": {
+    "std/": "https://deno.land/std@0.168.0/"
+  },
+  "tasks": {
+    "dev": "supabase functions serve --no-verify-jwt"
+  },
+  "lint": {
+    "include": ["**/*.ts"],
+    "exclude": ["**/generated/*"]
+  },
+  "fmt": {
+    "files": {
+      "include": ["**/*.ts"],
+      "exclude": ["**/generated/*"]
+    },
+    "options": {
+      "useTabs": false,
+      "lineWidth": 80,
+      "indentWidth": 2,
+      "singleQuote": true,
+      "proseWrap": "preserve"
+    }
+  }
+}

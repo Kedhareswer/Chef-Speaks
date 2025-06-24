@@ -1,9 +1,20 @@
 import { supabase } from '../lib/supabase'
-import { Database } from '../types/database'
 
-type VoiceSettingsRow = Database['public']['Tables']['user_voice_settings']['Row']
-type VoiceSettingsInsert = Database['public']['Tables']['user_voice_settings']['Insert']
-type VoiceSettingsUpdate = Database['public']['Tables']['user_voice_settings']['Update']
+// Define types based on the database schema since they're not in the generated types
+type VoiceSettingsRow = {
+  id: string
+  user_id: string
+  preferred_voice_id: string
+  voice_language: string
+  voice_speed: number
+  voice_stability: number
+  voice_similarity_boost: number
+  use_eleven_labs: boolean
+  created_at: string
+  updated_at: string
+}
+
+type VoiceSettingsInsert = Omit<VoiceSettingsRow, 'id' | 'created_at' | 'updated_at'>
 
 export interface UserVoiceSettings {
   id: string
@@ -67,9 +78,7 @@ export const userVoiceSettingsService = {
       // Check if settings exist
       const existingSettings = await this.getUserVoiceSettings(userId)
       
-      const settingsUpdate: VoiceSettingsUpdate = {
-        user_id: userId
-      }
+      const settingsUpdate: Partial<Omit<VoiceSettingsRow, 'id' | 'user_id' | 'created_at' | 'updated_at'>> = {}
       
       if (updates.preferredVoiceId !== undefined) settingsUpdate.preferred_voice_id = updates.preferredVoiceId
       if (updates.voiceLanguage !== undefined) settingsUpdate.voice_language = updates.voiceLanguage

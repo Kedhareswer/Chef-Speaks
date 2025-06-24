@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Plus, Star, Clock, ChefHat, Upload } from 'lucide-react';
+import { Users, Plus, Star, Upload } from 'lucide-react';
 import { Recipe, UserRecipe } from '../types';
 import { getUserRecipes, addUserRecipe, convertUserRecipeToRecipe } from '../data/userRecipes';
 import { RecipeCard } from './RecipeCard';

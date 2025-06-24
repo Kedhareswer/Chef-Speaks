@@ -13,7 +13,7 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
   disabled = false
 }) => {
   const [isUploading, setIsUploading] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl ?? null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,13 +49,11 @@ export const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
 
       // For demo purposes, we'll use the preview URL
       // In production, replace this with actual upload logic
-      const uploadedUrl = preview
-      
-      onImageChange(uploadedUrl)
+      onImageChange(preview)
     } catch (error) {
       console.error('Error uploading image:', error)
       alert('Failed to upload image. Please try again.')
-      setPreviewUrl(currentImageUrl)
+      setPreviewUrl(currentImageUrl ?? null)
     } finally {
       setIsUploading(false)
     }

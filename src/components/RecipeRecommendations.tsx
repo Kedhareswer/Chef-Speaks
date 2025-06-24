@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Sparkles, TrendingUp, Users, Calendar, RefreshCw } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+
 import { Recipe } from '../types'
 import { RecipeCard } from './RecipeCard'
 import { useAuth } from '../hooks/useAuth'
@@ -15,7 +15,6 @@ export const RecipeRecommendations: React.FC<RecipeRecommendationsProps> = ({
   onRecipeSelect,
   className = ''
 }) => {
-  const { t } = useTranslation()
   const { user } = useAuth()
   const [recommendations, setRecommendations] = useState<{
     ai_generated: Recipe[]

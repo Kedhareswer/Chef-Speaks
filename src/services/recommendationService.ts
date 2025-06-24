@@ -24,14 +24,12 @@ export const recommendationService = {
       const profile = await userService.getUserProfile(userId)
       if (!profile) return
 
-      // Get user's favorite recipes for analysis
+      // Get user's favorite recipe IDs for analysis
       const favoriteIds = await userService.getUserFavorites(userId)
-      const allRecipes = await recipeService.getAllRecipes()
-      const favoriteRecipes = allRecipes.filter(recipe => favoriteIds.includes(recipe.id))
 
       // Generate different types of recommendations
       await Promise.all([
-        this.generateAIRecommendations(userId, profile, favoriteRecipes),
+        this.generateAIRecommendations(userId, profile),
         this.generateTrendingRecommendations(userId),
         this.generateSimilarUserRecommendations(userId, favoriteIds),
         this.generateSeasonalRecommendations(userId, profile)
@@ -42,7 +40,7 @@ export const recommendationService = {
   },
 
   // Generate AI recommendations using Spoonacular
-  async generateAIRecommendations(userId: string, profile: any, favoriteRecipes: Recipe[]): Promise<void> {
+  async generateAIRecommendations(userId: string, profile: any): Promise<void> {
     try {
       // Build search parameters based on user preferences
       const searchParams = {

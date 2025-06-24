@@ -3,7 +3,6 @@ import { Comment } from '../types'
 import { Database } from '../types/database'
 
 type CommentRow = Database['public']['Tables']['comments']['Row']
-type CommentInsert = Database['public']['Tables']['comments']['Insert']
 
 // Convert database row to Comment type
 const convertDbCommentToComment = (dbComment: CommentRow): Comment => ({

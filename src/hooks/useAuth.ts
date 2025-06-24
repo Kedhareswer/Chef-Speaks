@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { User, Session } from '@supabase/supabase-js'
+import { User, Session, AuthChangeEvent } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { userService } from '../services/userService'
 import { userVoiceSettingsService } from '../services/userVoiceSettingsService'
@@ -37,15 +37,14 @@ export const useAuth = (): UseAuthReturn => {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
       setSession(session)
       setUser(session?.user ?? null)
 
       // Create profile on sign up or ensure it exists on sign in
       if (session?.user) {
-        if (event === 'SIGNED_UP') {
-          await createProfile(session.user)
-        } else if (event === 'SIGNED_IN') {
+        if (event === 'SIGNED_UP' || event === 'SIGNED_IN') {
+          // For both SIGNED_UP and SIGNED_IN events, ensure the user profile exists
           await ensureUserProfile(session.user)
         }
       } else {
