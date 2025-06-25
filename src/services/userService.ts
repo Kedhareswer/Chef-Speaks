@@ -32,29 +32,49 @@ const convertDbProfileToUserProfile = (dbProfile: ProfileRow): UserProfile => ({
 })
 
 export const userService = {
-  // Get user profile
+  // Get user profile with timeout and better error handling
   async getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
+      console.log('Fetching profile for user:', userId)
+      
+      // Add timeout to prevent hanging
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
+        .abortSignal(controller.signal)
+
+      clearTimeout(timeoutId)
 
       if (error) {
         // Handle the case where no profile exists (PGRST116 error)
         if (error.code === 'PGRST116') {
+          console.log('No profile found for user:', userId)
           return null
         }
+        console.error('Error fetching user profile:', error)
         throw error
       }
       
+      console.log('Profile fetched successfully for user:', userId)
       return convertDbProfileToUserProfile(data)
     } catch (error: any) {
-      // Additional check for PGRST116 error in catch block
-      if (error?.code === 'PGRST116') {
+      // Handle abort error
+      if (error.name === 'AbortError') {
+        console.error('Profile fetch timed out for user:', userId)
         return null
       }
+      
+      // Additional check for PGRST116 error in catch block
+      if (error?.code === 'PGRST116') {
+        console.log('No profile found for user:', userId)
+        return null
+      }
+      
       console.error('Error fetching user profile:', error)
       return null
     }

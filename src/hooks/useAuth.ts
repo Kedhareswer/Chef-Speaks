@@ -22,10 +22,12 @@ export const useAuth = (): UseAuthReturn => {
 
   useEffect(() => {
     let mounted = true
+    let setupTimeout: NodeJS.Timeout
 
     // Get initial session
     const initializeAuth = async () => {
       try {
+        console.log('Initializing authentication...')
         const { data: { session }, error } = await supabase.auth.getSession()
         
         if (!mounted) return
@@ -36,12 +38,21 @@ export const useAuth = (): UseAuthReturn => {
           return
         }
 
+        console.log('Session loaded:', session?.user?.id ? 'User found' : 'No user')
         setSession(session)
         setUser(session?.user ?? null)
         
-        // Handle user profile setup
+        // Handle user profile setup with timeout
         if (session?.user) {
+          setupTimeout = setTimeout(() => {
+            if (mounted && loading) {
+              console.warn('Profile setup timed out, continuing anyway')
+              setLoading(false)
+            }
+          }, 10000) // 10 second timeout
+
           await handleUserSetup(session.user)
+          clearTimeout(setupTimeout)
         }
       } catch (error) {
         console.error('Error initializing auth:', error)
@@ -65,14 +76,24 @@ export const useAuth = (): UseAuthReturn => {
       setSession(session)
       setUser(session?.user ?? null)
 
-      if (session?.user) {
-        if (event === 'SIGNED_UP' || event === 'SIGNED_IN') {
-          setLoading(true)
-          try {
-            await handleUserSetup(session.user)
-          } catch (error) {
-            console.error('Error during user setup:', error)
-          } finally {
+      if (session?.user && (event === 'SIGNED_UP' || event === 'SIGNED_IN')) {
+        setLoading(true)
+        
+        // Set timeout for profile setup
+        setupTimeout = setTimeout(() => {
+          if (mounted && loading) {
+            console.warn('Profile setup timed out during auth change, continuing anyway')
+            setLoading(false)
+          }
+        }, 8000) // 8 second timeout for auth changes
+
+        try {
+          await handleUserSetup(session.user)
+        } catch (error) {
+          console.error('Error during user setup:', error)
+        } finally {
+          clearTimeout(setupTimeout)
+          if (mounted) {
             setLoading(false)
           }
         }
@@ -83,6 +104,9 @@ export const useAuth = (): UseAuthReturn => {
 
     return () => {
       mounted = false
+      if (setupTimeout) {
+        clearTimeout(setupTimeout)
+      }
       subscription.unsubscribe()
     }
   }, [])
@@ -92,23 +116,37 @@ export const useAuth = (): UseAuthReturn => {
     try {
       console.log('Setting up user profile for:', user.id)
       
-      // Check if profile exists
-      let profile = await userService.getUserProfile(user.id)
+      // Add timeout for individual operations
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Profile setup timeout')), 5000)
+      })
+
+      // Check if profile exists with timeout
+      const profilePromise = userService.getUserProfile(user.id)
+      let profile = await Promise.race([profilePromise, timeoutPromise]) as any
       
       if (!profile) {
         console.log('Creating new profile for user:', user.id)
         // Create profile if it doesn't exist
-        await createProfile(user)
-        profile = await userService.getUserProfile(user.id)
+        const createPromise = createProfile(user)
+        await Promise.race([createPromise, timeoutPromise])
+        
+        // Try to get profile again
+        const retryPromise = userService.getUserProfile(user.id)
+        profile = await Promise.race([retryPromise, timeoutPromise]) as any
+      } else {
+        console.log('Profile already exists for user:', user.id)
       }
       
-      // Ensure voice settings exist
-      await userVoiceSettingsService.ensureUserVoiceSettings(user.id)
+      // Ensure voice settings exist with timeout
+      const voicePromise = userVoiceSettingsService.ensureUserVoiceSettings(user.id)
+      await Promise.race([voicePromise, timeoutPromise])
       
       console.log('User setup completed successfully')
     } catch (error) {
       console.error('Error in user setup:', error)
       // Don't throw the error - let the user continue even if profile setup fails
+      // This prevents infinite loading states
     }
   }
 
@@ -138,7 +176,7 @@ export const useAuth = (): UseAuthReturn => {
       console.log('Profile created successfully for user:', user.id)
     } catch (error) {
       console.error('Error creating profile:', error)
-      throw error
+      // Don't throw - let the app continue
     }
   }
 

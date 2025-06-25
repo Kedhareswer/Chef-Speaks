@@ -44,29 +44,48 @@ const convertDbVoiceSettingsToUserVoiceSettings = (dbSettings: VoiceSettingsRow)
 })
 
 export const userVoiceSettingsService = {
-  // Get user voice settings
+  // Get user voice settings with timeout
   async getUserVoiceSettings(userId: string): Promise<UserVoiceSettings | null> {
     try {
+      console.log('Fetching voice settings for user:', userId)
+      
+      // Add timeout to prevent hanging
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
+      
       const { data, error } = await supabase
         .from('user_voice_settings')
         .select('*')
         .eq('user_id', userId)
         .single()
+        .abortSignal(controller.signal)
+
+      clearTimeout(timeoutId)
 
       if (error) {
         // Handle the case where no settings exist (PGRST116 error)
         if (error.code === 'PGRST116') {
+          console.log('No voice settings found for user:', userId)
           return null
         }
         throw error
       }
       
+      console.log('Voice settings fetched successfully for user:', userId)
       return convertDbVoiceSettingsToUserVoiceSettings(data)
-    } catch (error) {
-      // Additional check for PGRST116 error in catch block
-      if (error?.code === 'PGRST116') {
+    } catch (error: any) {
+      // Handle abort error
+      if (error.name === 'AbortError') {
+        console.error('Voice settings fetch timed out for user:', userId)
         return null
       }
+      
+      // Additional check for PGRST116 error in catch block
+      if (error?.code === 'PGRST116') {
+        console.log('No voice settings found for user:', userId)
+        return null
+      }
+      
       console.error('Error fetching user voice settings:', error)
       return null
     }
@@ -125,17 +144,21 @@ export const userVoiceSettingsService = {
     }
   },
 
-  // Ensure user has voice settings
+  // Ensure user has voice settings with better error handling
   async ensureUserVoiceSettings(userId: string): Promise<UserVoiceSettings | null> {
     try {
+      console.log('Ensuring voice settings for user:', userId)
+      
       const existingSettings = await this.getUserVoiceSettings(userId)
       
       if (existingSettings) {
+        console.log('Voice settings already exist for user:', userId)
         return existingSettings
       }
       
+      console.log('Creating default voice settings for user:', userId)
       // Create default settings if none exist
-      return await this.updateUserVoiceSettings(userId, {
+      const newSettings = await this.updateUserVoiceSettings(userId, {
         preferredVoiceId: 'EXAVITQu4vr4xnSDxMaL', // Bella
         voiceLanguage: 'en',
         voiceSpeed: 1.0,
@@ -143,6 +166,9 @@ export const userVoiceSettingsService = {
         voiceSimilarityBoost: 0.75,
         useElevenLabs: true
       })
+      
+      console.log('Voice settings created successfully for user:', userId)
+      return newSettings
     } catch (error) {
       console.error('Error ensuring user voice settings:', error)
       return null
