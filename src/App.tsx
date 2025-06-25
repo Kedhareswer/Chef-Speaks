@@ -35,6 +35,7 @@ function App() {
   const [showShoppingList, setShowShoppingList] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const { location, loading: locationLoading } = useLocation();
   const { isListening, transcript, startListening, stopListening, isSupported } = useVoiceRecognition();
@@ -48,16 +49,25 @@ function App() {
 
   const initializeApp = async () => {
     setLoading(true);
+    setError(null);
+    
     try {
+      console.log('Initializing ChefSpeak app...');
+      
       // Check and seed database if needed (this may fail due to RLS, but that's okay)
-      await checkAndSeedDatabase();
+      try {
+        await checkAndSeedDatabase();
+      } catch (seedError) {
+        console.warn('Database seeding failed, but continuing:', seedError);
+      }
       
       // Load recipes (this should work even if seeding failed)
       await loadRecipes();
+      
+      console.log('App initialization completed');
     } catch (error) {
       console.error('Error initializing app:', error);
-      // Don't speak error message immediately on app load
-      console.warn('App initialization had issues, but continuing...');
+      setError('Failed to load the application. Please refresh the page.');
     } finally {
       setLoading(false);
     }
@@ -65,11 +75,13 @@ function App() {
 
   const loadRecipes = async () => {
     try {
+      console.log('Loading recipes...');
       const recipes = await recipeService.getAllRecipes();
+      console.log(`Loaded ${recipes.length} recipes`);
+      
       setAllRecipes(recipes);
       setFilteredRecipes(recipes);
       
-      // Only speak if we have recipes and user is interacting
       if (recipes.length === 0) {
         console.warn('No recipes found in database');
       }
@@ -224,12 +236,37 @@ function App() {
     );
   }
 
+  // Show loading screen while auth or app is loading
   if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-creamy-yellow-50 via-warm-green-50 to-terracotta-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-warm-green-500 mx-auto mb-6"></div>
           <p className="text-gray-600 text-lg">Loading ChefSpeak...</p>
+          {authLoading && (
+            <p className="text-gray-500 text-sm mt-2">Setting up your profile...</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Show error screen if there's an error
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-creamy-yellow-50 via-warm-green-50 to-terracotta-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="bg-red-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
+            <ChefHat className="w-8 h-8 text-red-600 mx-auto" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Oops! Something went wrong</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-gradient-to-r from-warm-green-500 to-terracotta-500 hover:from-warm-green-600 hover:to-terracotta-600 text-white font-semibold py-3 px-6 rounded-xl transition-all"
+          >
+            Refresh Page
+          </button>
         </div>
       </div>
     );

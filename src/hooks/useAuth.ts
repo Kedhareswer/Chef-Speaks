@@ -21,63 +21,101 @@ export const useAuth = (): UseAuthReturn => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let mounted = true
+
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      
-      // Check if user has a profile and create one if needed
-      if (session?.user) {
-        ensureUserProfile(session.user)
-      } else {
-        setLoading(false)
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (!mounted) return
+
+        if (error) {
+          console.error('Error getting session:', error)
+          setLoading(false)
+          return
+        }
+
+        setSession(session)
+        setUser(session?.user ?? null)
+        
+        // Handle user profile setup
+        if (session?.user) {
+          await handleUserSetup(session.user)
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error)
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
       }
-    })
+    }
+
+    initializeAuth()
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
+      if (!mounted) return
+
+      console.log('Auth state change:', event, session?.user?.id)
+      
       setSession(session)
       setUser(session?.user ?? null)
 
-      // Create profile on sign up or ensure it exists on sign in
       if (session?.user) {
         if (event === 'SIGNED_UP' || event === 'SIGNED_IN') {
-          // For both SIGNED_UP and SIGNED_IN events, ensure the user profile exists
-          await ensureUserProfile(session.user)
+          setLoading(true)
+          try {
+            await handleUserSetup(session.user)
+          } catch (error) {
+            console.error('Error during user setup:', error)
+          } finally {
+            setLoading(false)
+          }
         }
       } else {
         setLoading(false)
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
-  // Ensure user has a profile, create one if it doesn't exist
-  const ensureUserProfile = async (user: User) => {
+  // Handle user profile and voice settings setup
+  const handleUserSetup = async (user: User) => {
     try {
-      setLoading(true)
-      const profile = await userService.getUserProfile(user.id)
+      console.log('Setting up user profile for:', user.id)
+      
+      // Check if profile exists
+      let profile = await userService.getUserProfile(user.id)
       
       if (!profile) {
-        console.log('No profile found for user, creating one...')
+        console.log('Creating new profile for user:', user.id)
+        // Create profile if it doesn't exist
         await createProfile(user)
+        profile = await userService.getUserProfile(user.id)
       }
       
-      // Also ensure user has voice settings
+      // Ensure voice settings exist
       await userVoiceSettingsService.ensureUserVoiceSettings(user.id)
+      
+      console.log('User setup completed successfully')
     } catch (error) {
-      console.error('Error ensuring user profile:', error)
-    } finally {
-      setLoading(false)
+      console.error('Error in user setup:', error)
+      // Don't throw the error - let the user continue even if profile setup fails
     }
   }
 
   const createProfile = async (user: User) => {
     try {
       console.log('Creating profile for user:', user.id)
+      
       const { error } = await supabase
         .from('profiles')
         .insert({
@@ -88,16 +126,19 @@ export const useAuth = (): UseAuthReturn => {
         })
 
       if (error) {
+        // If profile already exists, that's okay
+        if (error.code === '23505') {
+          console.log('Profile already exists for user:', user.id)
+          return
+        }
         console.error('Error creating profile:', error)
         throw error
       }
       
-      console.log('Profile created successfully')
-      
-      // Also create default voice settings
-      await userVoiceSettingsService.ensureUserVoiceSettings(user.id)
+      console.log('Profile created successfully for user:', user.id)
     } catch (error) {
       console.error('Error creating profile:', error)
+      throw error
     }
   }
 
@@ -111,10 +152,10 @@ export const useAuth = (): UseAuthReturn => {
       if (error) throw error
     } catch (error) {
       console.error('Error signing in:', error)
-      throw error
-    } finally {
       setLoading(false)
+      throw error
     }
+    // Don't set loading to false here - let the auth state change handler do it
   }
 
   const signUp = async (email: string, password: string, fullName?: string) => {
@@ -132,10 +173,10 @@ export const useAuth = (): UseAuthReturn => {
       if (error) throw error
     } catch (error) {
       console.error('Error signing up:', error)
-      throw error
-    } finally {
       setLoading(false)
+      throw error
     }
+    // Don't set loading to false here - let the auth state change handler do it
   }
 
   const signOut = async () => {
