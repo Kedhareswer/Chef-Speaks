@@ -54,7 +54,7 @@ export const userVoiceSettingsService = {
       const timeoutId = setTimeout(() => {
         console.log('Voice settings fetch timeout reached for user:', userId)
         controller.abort()
-      }, 8000) // Increased to 8 seconds
+      }, 15000) // Increased from 8000ms to 15000ms
       
       const { data, error } = await supabase
         .from('user_voice_settings')

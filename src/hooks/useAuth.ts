@@ -49,7 +49,7 @@ export const useAuth = (): UseAuthReturn => {
               console.warn('Profile setup timed out, continuing anyway')
               setLoading(false)
             }
-          }, 15000) // Increased to 15 seconds
+          }, 30000) // Increased from 15000ms to 30000ms
 
           await handleUserSetup(session.user)
           clearTimeout(setupTimeout)
@@ -85,7 +85,7 @@ export const useAuth = (): UseAuthReturn => {
             console.warn('Profile setup timed out during auth change, continuing anyway')
             setLoading(false)
           }
-        }, 12000) // Increased to 12 seconds for auth changes
+        }, 25000) // Increased from 12000ms to 25000ms
 
         try {
           await handleUserSetup(session.user)
@@ -118,7 +118,7 @@ export const useAuth = (): UseAuthReturn => {
       
       // Increased timeout for individual operations
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Profile setup timeout')), 8000) // Increased to 8 seconds
+        setTimeout(() => reject(new Error('Profile setup timeout')), 20000) // Increased from 8000ms to 20000ms
       })
 
       // Check if profile exists with timeout
@@ -131,9 +131,9 @@ export const useAuth = (): UseAuthReturn => {
         const createPromise = createProfile(user)
         await Promise.race([createPromise, timeoutPromise])
         
-        // Try to get profile again with a shorter timeout for retry
+        // Try to get profile again with a longer timeout for retry
         const retryTimeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Profile retry timeout')), 3000)
+          setTimeout(() => reject(new Error('Profile retry timeout')), 10000) // Increased from 3000ms to 10000ms
         })
         const retryPromise = userService.getUserProfile(user.id)
         try {

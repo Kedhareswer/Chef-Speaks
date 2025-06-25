@@ -42,7 +42,7 @@ export const userService = {
       const timeoutId = setTimeout(() => {
         console.log('Profile fetch timeout reached for user:', userId)
         controller.abort()
-      }, 10000) // Increased to 10 seconds
+      }, 20000) // Increased from 10000ms to 20000ms
       
       const { data, error } = await supabase
         .from('profiles')
