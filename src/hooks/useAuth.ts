@@ -42,14 +42,14 @@ export const useAuth = (): UseAuthReturn => {
         setSession(session)
         setUser(session?.user ?? null)
         
-        // Handle user profile setup with timeout
+        // Handle user profile setup with increased timeout
         if (session?.user) {
           setupTimeout = setTimeout(() => {
             if (mounted && loading) {
               console.warn('Profile setup timed out, continuing anyway')
               setLoading(false)
             }
-          }, 10000) // 10 second timeout
+          }, 15000) // Increased to 15 seconds
 
           await handleUserSetup(session.user)
           clearTimeout(setupTimeout)
@@ -85,7 +85,7 @@ export const useAuth = (): UseAuthReturn => {
             console.warn('Profile setup timed out during auth change, continuing anyway')
             setLoading(false)
           }
-        }, 8000) // 8 second timeout for auth changes
+        }, 12000) // Increased to 12 seconds for auth changes
 
         try {
           await handleUserSetup(session.user)
@@ -111,14 +111,14 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, [])
 
-  // Handle user profile and voice settings setup
+  // Handle user profile and voice settings setup with improved error handling
   const handleUserSetup = async (user: User) => {
     try {
       console.log('Setting up user profile for:', user.id)
       
-      // Add timeout for individual operations
+      // Increased timeout for individual operations
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Profile setup timeout')), 5000)
+        setTimeout(() => reject(new Error('Profile setup timeout')), 8000) // Increased to 8 seconds
       })
 
       // Check if profile exists with timeout
@@ -131,16 +131,29 @@ export const useAuth = (): UseAuthReturn => {
         const createPromise = createProfile(user)
         await Promise.race([createPromise, timeoutPromise])
         
-        // Try to get profile again
+        // Try to get profile again with a shorter timeout for retry
+        const retryTimeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Profile retry timeout')), 3000)
+        })
         const retryPromise = userService.getUserProfile(user.id)
-        profile = await Promise.race([retryPromise, timeoutPromise]) as any
+        try {
+          profile = await Promise.race([retryPromise, retryTimeoutPromise]) as any
+        } catch (retryError) {
+          console.warn('Profile retry failed, but continuing:', retryError)
+          // Continue even if retry fails
+        }
       } else {
         console.log('Profile already exists for user:', user.id)
       }
       
-      // Ensure voice settings exist with timeout
-      const voicePromise = userVoiceSettingsService.ensureUserVoiceSettings(user.id)
-      await Promise.race([voicePromise, timeoutPromise])
+      // Ensure voice settings exist with timeout - but don't block on failure
+      try {
+        const voicePromise = userVoiceSettingsService.ensureUserVoiceSettings(user.id)
+        await Promise.race([voicePromise, timeoutPromise])
+      } catch (voiceError) {
+        console.warn('Voice settings setup failed, but continuing:', voiceError)
+        // Don't block the auth flow if voice settings fail
+      }
       
       console.log('User setup completed successfully')
     } catch (error) {

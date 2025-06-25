@@ -44,14 +44,17 @@ const convertDbVoiceSettingsToUserVoiceSettings = (dbSettings: VoiceSettingsRow)
 })
 
 export const userVoiceSettingsService = {
-  // Get user voice settings with timeout
+  // Get user voice settings with improved timeout
   async getUserVoiceSettings(userId: string): Promise<UserVoiceSettings | null> {
     try {
       console.log('Fetching voice settings for user:', userId)
       
-      // Add timeout to prevent hanging
+      // Increased timeout and better abort handling
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
+      const timeoutId = setTimeout(() => {
+        console.log('Voice settings fetch timeout reached for user:', userId)
+        controller.abort()
+      }, 8000) // Increased to 8 seconds
       
       const { data, error } = await supabase
         .from('user_voice_settings')
@@ -74,9 +77,9 @@ export const userVoiceSettingsService = {
       console.log('Voice settings fetched successfully for user:', userId)
       return convertDbVoiceSettingsToUserVoiceSettings(data)
     } catch (error: any) {
-      // Handle abort error
+      // Handle abort error more gracefully
       if (error.name === 'AbortError') {
-        console.error('Voice settings fetch timed out for user:', userId)
+        console.warn('Voice settings fetch was aborted for user:', userId, '- this may be due to network issues')
         return null
       }
       

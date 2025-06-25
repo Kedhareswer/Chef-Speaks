@@ -55,7 +55,7 @@ class ElevenLabsService {
     }
 
     try {
-      const { error } = await supabase.functions.invoke('elevenlabs-tts', {
+      const { data, error } = await supabase.functions.invoke('elevenlabs-tts', {
         body: {
           text: 'test',
           voice_id: 'EXAVITQu4vr4xnSDxMaL'
@@ -64,6 +64,13 @@ class ElevenLabsService {
 
       if (error) {
         console.warn('Eleven Labs TTS service not configured:', error.message)
+        this.isConfigured = false
+        return false
+      }
+
+      // Check if the response indicates configuration issues
+      if (data && typeof data === 'object' && 'configuration_required' in data) {
+        console.warn('Eleven Labs TTS service requires configuration:', data)
         this.isConfigured = false
         return false
       }
@@ -126,18 +133,29 @@ class ElevenLabsService {
         console.error('Supabase function error:', error)
         
         // Check if it's a configuration error
-        if (error.message?.includes('not configured') || error.message?.includes('API key')) {
+        if (error.message?.includes('not configured') || 
+            error.message?.includes('API key') ||
+            error.message?.includes('configuration_required')) {
           this.isConfigured = false
           console.warn('Eleven Labs API key not configured in Supabase Edge Functions')
           return null
         }
         
-        throw new Error(`TTS service error: ${error.message}`)
+        // Don't throw error for TTS failures - just return null
+        console.warn(`TTS service error: ${error.message}`)
+        return null
       }
 
       // Check if we received valid audio data
       if (!data) {
         console.error('No audio data received')
+        return null
+      }
+
+      // Check if the response indicates configuration issues
+      if (typeof data === 'object' && 'configuration_required' in data) {
+        console.warn('Eleven Labs TTS service requires configuration:', data)
+        this.isConfigured = false
         return null
       }
 
@@ -165,10 +183,13 @@ class ElevenLabsService {
       console.error('Error in generateSpeech:', errorMessage);
       
       // Mark as not configured if it's a service error
-      if (errorMessage.includes('not configured') || errorMessage.includes('API key')) {
+      if (errorMessage.includes('not configured') || 
+          errorMessage.includes('API key') ||
+          errorMessage.includes('configuration_required')) {
         this.isConfigured = false;
       }
       
+      // Don't throw error - just return null to gracefully handle TTS failures
       return null;
     }
   }

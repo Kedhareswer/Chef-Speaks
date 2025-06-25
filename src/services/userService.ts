@@ -32,14 +32,17 @@ const convertDbProfileToUserProfile = (dbProfile: ProfileRow): UserProfile => ({
 })
 
 export const userService = {
-  // Get user profile with timeout and better error handling
+  // Get user profile with improved timeout and error handling
   async getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
       console.log('Fetching profile for user:', userId)
       
-      // Add timeout to prevent hanging
+      // Increased timeout and better abort handling
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+      const timeoutId = setTimeout(() => {
+        console.log('Profile fetch timeout reached for user:', userId)
+        controller.abort()
+      }, 10000) // Increased to 10 seconds
       
       const { data, error } = await supabase
         .from('profiles')
@@ -63,9 +66,9 @@ export const userService = {
       console.log('Profile fetched successfully for user:', userId)
       return convertDbProfileToUserProfile(data)
     } catch (error: any) {
-      // Handle abort error
+      // Handle abort error more gracefully
       if (error.name === 'AbortError') {
-        console.error('Profile fetch timed out for user:', userId)
+        console.warn('Profile fetch was aborted for user:', userId, '- this may be due to network issues')
         return null
       }
       

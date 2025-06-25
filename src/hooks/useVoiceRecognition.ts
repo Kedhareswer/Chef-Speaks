@@ -119,7 +119,13 @@ export const useVoiceRecognition = (initialLanguage: string = 'en-US'): UseVoice
     recognitionInstance.onstart = () => setIsListening(true);
     recognitionInstance.onend = () => setIsListening(false);
     recognitionInstance.onerror = (event: SpeechRecognitionErrorEvent) => {
-      console.error('Speech recognition error:', event.error, event.message);
+      // Only log actual errors, not normal speech recognition states
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
+        console.error('Speech recognition error:', event.error, event.message);
+      } else if (event.error === 'no-speech') {
+        // This is normal behavior when no speech is detected
+        console.log('No speech detected - this is normal behavior');
+      }
       setIsListening(false);
     };
 
