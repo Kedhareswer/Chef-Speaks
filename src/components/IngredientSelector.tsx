@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, ChefHat, Sparkles, MapPin, Search, Filter, Zap, Loader, AlertCircle, Mic, ShoppingCart, BookOpen } from 'lucide-react';
+import { Plus, X, ChefHat, Sparkles, MapPin, Search, Filter, Zap, Loader, AlertCircle, Mic } from 'lucide-react';
 import { commonIngredients, suggestPairings } from '../data/ingredients';
 import { Recipe } from '../types';
 import { spoonacularService } from '../services/spoonacularService';
@@ -26,7 +26,7 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const { speak, isSpeaking } = useEnhancedSpeechSynthesis();
+  const { speak } = useEnhancedSpeechSynthesis();
   
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,7 +38,7 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
   const [apiAvailable, setApiAvailable] = useState(true);
   const [searchError, setSearchError] = useState<string | null>(null);
   
-  // Voice recognition
+  // Voice recognition and state
   const voiceRecognition = useVoiceRecognition(i18n.language);
   const [voiceStatus, setVoiceStatus] = useState<string>('');
   const [conversationContext, setConversationContext] = useState<string | null>(null);
@@ -50,8 +50,10 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
     mealType?: string;
   }>({ dietary: [] });
   
-  // Shopping list and narration state
+  // Shopping list state
   const [isCreatingShoppingList, setIsCreatingShoppingList] = useState(false);
+  
+
 
   const categories = [
     { id: 'all', name: 'All', icon: '🍽️', color: 'from-soft-brown-500 to-soft-brown-600' },
@@ -511,6 +513,69 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
     setSearchError(null);
   };
 
+  // Voice Preferences Tags Component
+  const VoicePreferencesTags: React.FC<{
+    preferences: {
+      dietary: string[];
+      cookTime?: number;
+      difficulty?: string;
+      mealType?: string;
+    };
+  }> = ({ preferences }) => {
+    if (!preferences.dietary.length && !preferences.cookTime && !preferences.difficulty && !preferences.mealType) {
+      return null;
+    }
+
+    return (
+      <div className="flex flex-wrap gap-2 mt-3">
+        {preferences.dietary.map(diet => (
+          <span key={diet} className="px-3 py-1.5 bg-light-lavender-100 text-light-lavender-700 rounded-full text-sm font-medium">
+            {diet}
+          </span>
+        ))}
+        {preferences.cookTime && (
+          <span className="px-3 py-1.5 bg-dusty-pink-100 text-dusty-pink-700 rounded-full text-sm font-medium">
+            Under {preferences.cookTime} min
+          </span>
+        )}
+        {preferences.difficulty && (
+          <span className="px-3 py-1.5 bg-warm-green-100 text-warm-green-700 rounded-full text-sm font-medium">
+            {preferences.difficulty}
+          </span>
+        )}
+        {preferences.mealType && (
+          <span className="px-3 py-1.5 bg-muted-blue-100 text-muted-blue-700 rounded-full text-sm font-medium">
+            {preferences.mealType}
+          </span>
+        )}
+      </div>
+    );
+  };
+
+  // Voice Suggestions Component
+  const VoiceSuggestions: React.FC<{
+    context: string | null;
+    isListening: boolean;
+  }> = ({ context, isListening }) => {
+    if (!isListening || !context) return null;
+
+    return (
+      <div className="mt-2 p-3 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm border border-warm-green-100">
+        <p className="text-sm text-gray-600">
+          {context === 'ingredients' ? (
+            'Try saying: "Add tomatoes" or "Remove onions"'
+          ) : context === 'shopping_list' ? (
+            'Try saying: "Create shopping list" or "Add all to cart"'
+          ) : context === 'recipe_narration' ? (
+            'Try saying: "Read recipe" or "Read ingredients"'
+          ) : (
+            'Try saying: "Search recipes" or "Start over"'
+          )}
+        </p>
+      </div>
+    );
+  };
+
   return (
     <div className="glass-organic backdrop-blur-organic rounded-5xl shadow-soft-xl p-8 mb-8 border border-terracotta-200/30">
       <div className="flex items-center justify-between mb-6">
@@ -586,239 +651,162 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
         </div>
       )}
 
-      {/* Selected Ingredients */}
-      {selectedIngredients.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-soft-brown-800 mb-3 flex items-center gap-2">
-            <Filter className="w-5 h-5 text-warm-green-500" />
-            Selected Ingredients ({selectedIngredients.length})
-          </h3>
-          <div className="flex flex-wrap gap-3">
-            {selectedIngredients.map((ingredient) => (
-              <span
-                key={ingredient}
-                className="bg-gradient-to-r from-warm-green-100 to-muted-blue-100 text-warm-green-800 px-4 py-2 rounded-pill font-medium flex items-center gap-2 border border-warm-green-200 shadow-soft"
-              >
-                {ingredient}
-                <button
-                  onClick={() => removeIngredient(ingredient)}
-                  className="hover:bg-warm-green-200 rounded-full p-1 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Suggested Pairings */}
-      {suggestedPairings.length > 0 && (
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-5 h-5 text-light-lavender-500" />
-            <h3 className="text-lg font-semibold text-soft-brown-800">AI Suggested Pairings</h3>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {suggestedPairings.map((pairing) => (
-              <button
-                key={pairing}
-                onClick={() => addIngredient(pairing)}
-                className="bg-gradient-to-r from-light-lavender-50 to-dusty-pink-50 text-light-lavender-700 px-4 py-2 rounded-pill font-medium hover:from-light-lavender-100 hover:to-dusty-pink-100 transition-all flex items-center gap-2 border border-light-lavender-200 shadow-soft hover:shadow-soft-lg transform hover:scale-105"
-              >
-                <Plus className="w-4 h-4" />
-                {pairing}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {isExpanded && (
         <>
           {/* Search Input */}
-          <div className="mb-6">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-soft-brown-400 w-5 h-5" />
+          <div className="mb-8">
+            <div className="relative group">
+              <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-soft-brown-400 w-6 h-6 group-focus-within:text-warm-green-500 transition-colors pointer-events-none" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={t('ingredientSelector.searchPlaceholder', { defaultValue: 'Search for ingredients...' })}
-                className="w-full pl-12 pr-16 py-3 border-2 border-soft-brown-200 rounded-4xl focus:outline-none focus:ring-4 focus:ring-warm-green-500/20 focus:border-warm-green-500 transition-all glass-organic backdrop-blur-organic"
+                className="w-full pl-16 pr-24 py-5 text-lg glass-organic backdrop-blur-organic rounded-[2rem] shadow-soft-xl border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-warm-green-500/20 focus:border-warm-green-500 transition-all placeholder-soft-brown-400 min-h-[64px] font-medium"
+                autoComplete="off"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck="false"
               />
               
               {/* Voice Search Button */}
               {voiceRecognition.isSupported && (
                 <button
                   onClick={voiceRecognition.isListening ? voiceRecognition.stopListening : voiceRecognition.startListening}
-                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                    voiceRecognition.isListening
-                      ? 'bg-red-500 text-white animate-pulse'
-                      : 'bg-warm-green-500 text-white hover:bg-warm-green-600'
-                  }`}
+                  className={`
+                    absolute right-3 top-1/2 transform -translate-y-1/2 p-3 rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg min-h-[48px] min-w-[48px]
+                    ${voiceRecognition.isListening 
+                      ? 'bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 text-white animate-soft-pulse shadow-terracotta-500/30' 
+                      : 'bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 hover:from-warm-green-600 hover:via-terracotta-600 hover:to-soft-brown-600 text-white shadow-warm-green-500/30'
+                    }
+                  `}
                   title={voiceRecognition.isListening ? 
                     t('voice.stopListening', { defaultValue: 'Stop listening' }) : 
                     t('voice.startListening', { defaultValue: 'Start voice search' })
                   }
                 >
-                  <Mic className="w-5 h-5" />
+                  <Mic className="w-6 h-6" />
                 </button>
               )}
             </div>
-            
-            {/* Voice Status */}
-            {(voiceStatus || voiceRecognition.isListening || isSpeaking) && (
-              <div className="mt-3 p-3 bg-gradient-to-r from-warm-green-50 to-muted-blue-50 rounded-3xl border border-warm-green-200">
-                <div className="flex items-center gap-2">
-                  {isSpeaking ? (
-                    <BookOpen className="w-4 h-4 text-blue-500 animate-pulse" />
-                  ) : (
-                    <Mic className={`w-4 h-4 ${voiceRecognition.isListening ? 'text-red-500 animate-pulse' : 'text-warm-green-500'}`} />
-                  )}
-                  <span className="text-sm font-medium text-soft-brown-700">
-                    {isSpeaking ? 
-                      'Reading recipe aloud...' :
-                      voiceRecognition.isListening ? 
-                      t('voice.listening', { defaultValue: 'Listening... Say something like "I have chicken and rice"' }) : 
-                      voiceStatus
-                    }
-                  </span>
+
+            {/* Voice Status, Preferences, and Suggestions */}
+            {voiceStatus && (
+              <div className="mt-4 p-4 bg-gradient-to-r from-warm-green-50 to-muted-blue-50 rounded-3xl border border-warm-green-200">
+                <div className="flex items-start gap-4">
+                  <div className="bg-gradient-to-r from-warm-green-500 to-muted-blue-500 p-3 rounded-2xl">
+                    <Mic className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-warm-green-800 font-medium">{voiceStatus}</p>
+                    <VoicePreferencesTags preferences={voicePreferences} />
+                  </div>
                 </div>
               </div>
             )}
-            
-            {/* Quick Action Buttons */}
-            {selectedIngredients.length > 0 && (
-              <div className="mt-3 flex gap-2 flex-wrap">
-                {user && (
-                  <button
-                    onClick={() => handleShoppingListCommand({ 
-                      action: 'shopping_list', 
-                      shoppingListAction: 'add_missing' 
-                    })}
-                    disabled={isCreatingShoppingList}
-                    className="flex items-center gap-2 px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-2xl text-sm font-medium transition-colors disabled:opacity-50"
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    {isCreatingShoppingList ? 'Adding...' : 'Add Missing to Shopping List'}
-                  </button>
-                )}
-                
-                {allRecipes.length > 0 && (
-                  <button
-                    onClick={() => handleRecipeNarrationCommand({ 
-                      action: 'recipe_narration', 
-                      narrationAction: 'read_recipe' 
-                    })}
-                    disabled={isSpeaking}
-                    className="flex items-center gap-2 px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-2xl text-sm font-medium transition-colors disabled:opacity-50"
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    {isSpeaking ? 'Reading...' : 'Read Top Recipe'}
-                  </button>
-                )}
-              </div>
-            )}
-            
-            {/* Smart Conversation Panel */}
-            {(conversationContext || followUpQuestion) && (
-              <div className="mt-3 p-4 bg-gradient-to-r from-light-lavender-50 to-dusty-pink-50 rounded-3xl border border-light-lavender-200">
-                <div className="flex items-start gap-3">
-                  <div className="bg-gradient-to-r from-light-lavender-500 to-dusty-pink-500 p-2 rounded-full flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-sm font-semibold text-soft-brown-800 mb-1">
-                      {conversationContext === 'meal_planning' && 'Meal Planning Assistant'}
-                      {conversationContext === 'dietary_filtering' && 'Dietary Assistant'}
-                      {conversationContext === 'time_based' && 'Quick Cooking Assistant'}
-                      {conversationContext === 'flavor_based' && 'Flavor Assistant'}
-                      {conversationContext === 'ingredient_search' && 'Ingredient Assistant'}
-                    </h4>
-                    {followUpQuestion && (
-                      <p className="text-sm text-soft-brown-600">{followUpQuestion}</p>
-                    )}
-                    
-                    {/* Voice Preferences Display */}
-                    {(voicePreferences.dietary.length > 0 || voicePreferences.cookTime || voicePreferences.difficulty || voicePreferences.mealType) && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {voicePreferences.dietary.map(diet => (
-                          <span key={diet} className="px-2 py-1 bg-light-lavender-100 text-light-lavender-700 rounded-full text-xs font-medium">
-                            {diet}
-                          </span>
-                        ))}
-                        {voicePreferences.cookTime && (
-                          <span className="px-2 py-1 bg-dusty-pink-100 text-dusty-pink-700 rounded-full text-xs font-medium">
-                            Under {voicePreferences.cookTime} min
-                          </span>
-                        )}
-                        {voicePreferences.difficulty && (
-                          <span className="px-2 py-1 bg-warm-green-100 text-warm-green-700 rounded-full text-xs font-medium">
-                            {voicePreferences.difficulty}
-                          </span>
-                        )}
-                        {voicePreferences.mealType && (
-                          <span className="px-2 py-1 bg-muted-blue-100 text-muted-blue-700 rounded-full text-xs font-medium">
-                            {voicePreferences.mealType}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    
-                    {/* Quick Voice Examples */}
-                    <div className="mt-3 text-xs text-soft-brown-500">
-                      <strong>Try saying:</strong> 
-                      {conversationContext === 'meal_planning' && ' "I have pasta and tomatoes", "Show me vegetarian options", or "Add missing ingredients to shopping list"'}
-                      {conversationContext === 'dietary_filtering' && ' "I also have cheese", "Make it under 20 minutes", or "Read me the ingredients"'}
-                      {conversationContext === 'time_based' && ' "I have chicken breast", "Something spicy", or "Create shopping list from recipe"'}
-                      {conversationContext === 'flavor_based' && ' "I have garlic and herbs", "Make it vegetarian", or "Tell me the nutrition info"'}
-                      {conversationContext === 'ingredient_search' && ' "I also have onions", "Make it quick and easy", "Read the top recipe", or "Add to shopping list"'}
-                      {!conversationContext && ' "Read me the recipe", "Add missing ingredients to shopping list", "I have chicken and rice", or "What can I make for dinner?"'}
-                    </div>
-                  </div>
-                </div>
+            <VoiceSuggestions 
+              context={conversationContext}
+              isListening={voiceRecognition.isListening}
+            />
+            {followUpQuestion && (
+              <div className="mt-2 p-3 bg-warm-green-50/80 backdrop-blur-sm rounded-lg shadow-sm">
+                <p className="text-sm text-warm-green-700">{followUpQuestion}</p>
               </div>
             )}
           </div>
 
           {/* Category Filters */}
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2">
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-3">
               {categories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-3xl font-medium transition-all transform hover:scale-105 ${
-                    activeCategory === category.id
-                      ? `bg-gradient-to-r ${category.color} text-white shadow-soft-lg`
-                      : 'bg-creamy-yellow-50/80 text-soft-brown-700 hover:bg-creamy-yellow-100/80 shadow-soft border border-soft-brown-200'
-                  }`}
+                  className={`
+                    flex items-center gap-2 px-5 py-3 rounded-2xl font-medium transition-all transform hover:scale-105
+                    ${activeCategory === category.id
+                      ? `bg-gradient-to-r ${category.color} text-white shadow-soft-xl`
+                      : 'bg-soft-brown-50/80 text-soft-brown-700 hover:bg-soft-brown-100/80 shadow-soft border border-soft-brown-200/50'
+                    }
+                  `}
                 >
-                  <span>{category.icon}</span>
-                  {category.name}
+                  <span className="text-xl">{category.icon}</span>
+                  <span className="font-medium">{category.name}</span>
                 </button>
               ))}
             </div>
           </div>
 
+          {/* Selected Ingredients */}
+          {selectedIngredients.length > 0 && (
+            <div className="mb-8 p-6 bg-gradient-to-r from-warm-green-50/50 to-muted-blue-50/50 rounded-3xl border border-warm-green-200/50 backdrop-blur-sm">
+              <h3 className="text-lg font-semibold text-soft-brown-800 mb-4 flex items-center gap-2">
+                <Filter className="w-5 h-5 text-warm-green-500" />
+                Selected Ingredients ({selectedIngredients.length})
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {selectedIngredients.map((ingredient) => (
+                  <span
+                    key={ingredient}
+                    className="bg-gradient-to-r from-warm-green-100 to-muted-blue-100 text-warm-green-800 px-4 py-2 rounded-xl font-medium flex items-center gap-2 border border-warm-green-200/50 shadow-soft group hover:shadow-soft-lg transition-all"
+                  >
+                    {ingredient}
+                    <button
+                      onClick={() => removeIngredient(ingredient)}
+                      className="opacity-50 group-hover:opacity-100 hover:bg-warm-green-200/50 rounded-full p-1 transition-all"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Suggested Pairings */}
+          {suggestedPairings.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-5 h-5 text-light-lavender-500" />
+                <h3 className="text-lg font-semibold text-soft-brown-800">AI Suggested Pairings</h3>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {suggestedPairings.map((pairing) => (
+                  <button
+                    key={pairing}
+                    onClick={() => addIngredient(pairing)}
+                    className="bg-gradient-to-r from-light-lavender-50 to-dusty-pink-50 text-light-lavender-700 px-4 py-2.5 rounded-xl font-medium hover:from-light-lavender-100 hover:to-dusty-pink-100 transition-all flex items-center gap-2 border border-light-lavender-200/50 shadow-soft hover:shadow-soft-lg transform hover:scale-105"
+                  >
+                    <Plus className="w-4 h-4" />
+                    {pairing}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Ingredient Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filteredIngredients.slice(0, 20).map((ingredient) => (
               <button
                 key={ingredient.name}
                 onClick={() => addIngredient(ingredient.name)}
-                className="glass-organic hover:bg-creamy-yellow-50 text-soft-brown-700 px-4 py-3 rounded-3xl transition-all flex items-center gap-2 text-sm font-medium border border-soft-brown-200 hover:border-soft-brown-300 hover:shadow-soft-lg transform hover:scale-105"
+                className="glass-organic hover:bg-creamy-yellow-50/80 text-soft-brown-700 p-4 rounded-2xl transition-all flex items-center gap-3 text-sm font-medium border border-soft-brown-200/50 hover:border-soft-brown-300/50 hover:shadow-soft-lg transform hover:scale-105 group"
               >
-                <Plus className="w-4 h-4 text-warm-green-500" />
-                {ingredient.name}
+                <div className="bg-warm-green-100 text-warm-green-600 p-2 rounded-xl group-hover:bg-warm-green-200 transition-colors">
+                  <Plus className="w-4 h-4" />
+                </div>
+                <span className="truncate">{ingredient.name}</span>
               </button>
             ))}
           </div>
 
           {filteredIngredients.length === 0 && searchTerm && (
-            <div className="text-center py-8">
-              <p className="text-soft-brown-500">No ingredients found matching "{searchTerm}"</p>
+            <div className="text-center py-12">
+              <div className="inline-flex items-center gap-3 px-6 py-4 bg-soft-brown-50 rounded-2xl text-soft-brown-600">
+                <Search className="w-5 h-5 text-soft-brown-400" />
+                <p className="font-medium">No ingredients found matching "{searchTerm}"</p>
+              </div>
             </div>
           )}
         </>
@@ -830,10 +818,10 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-warm-green-800 font-semibold flex items-center gap-2">
-                {isSearching ? (
+                {isSearching || isCreatingShoppingList ? (
                   <>
                     <Loader className="w-5 h-5 animate-spin" />
-                    Searching for recipes...
+                    {isCreatingShoppingList ? 'Creating shopping list...' : 'Searching for recipes...'}
                   </>
                 ) : (
                   <>
