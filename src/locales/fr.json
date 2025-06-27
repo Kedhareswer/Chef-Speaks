@@ -32,7 +32,7 @@
   "startCooking": "Commencer à Cuisiner",
   "shareRecipe": "Partager la Recette",
   "viewRecipe": "Voir la Recette",
-  "recipes": "Recettes",
+  "recipesList": "Recettes",
   "searchResults": {
     "foundOne": "Trouvé 1 recette pour {{query}}",
     "foundMany": "Trouvé {{count}} recettes pour {{query}}",
@@ -122,7 +122,7 @@
   "editProfile": "Modifier le Profil",
   "signOut": "Se Déconnecter",
   "none": "aucune",
-  "voice": "Voix",
+  "voiceSettings": "Voix",
   "preferredVoice": "Voix Préférée",
   "useElevenLabs": "Utiliser la Voix Améliorée",
   "enabled": "Activé",

@@ -52,7 +52,6 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
   
   // Shopping list and narration state
   const [isCreatingShoppingList, setIsCreatingShoppingList] = useState(false);
-  const [selectedRecipeForAction, setSelectedRecipeForAction] = useState<Recipe | null>(null);
 
   const categories = [
     { id: 'all', name: 'All', icon: '🍽️', color: 'from-soft-brown-500 to-soft-brown-600' },
@@ -272,7 +271,6 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
     }
     
     const recipe = currentRecipes[0];
-    setSelectedRecipeForAction(recipe);
     
     try {
       if (command.narrationAction === 'read_recipe') {
