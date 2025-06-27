@@ -39,6 +39,25 @@ export const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe, onBack }) =>
     setCheckedInstructions(newChecked);
   };
 
+  // Improved toggle functions to ensure only one section is active at a time
+  const toggleNutrition = () => {
+    if (showNutrition) {
+      setShowNutrition(false);
+    } else {
+      setShowNutrition(true);
+      setShowComments(false); // Hide comments when showing nutrition
+    }
+  };
+
+  const toggleComments = () => {
+    if (showComments) {
+      setShowComments(false);
+    } else {
+      setShowComments(true);
+      setShowNutrition(false); // Hide nutrition when showing comments
+    }
+  };
+
   if (showCookingMode) {
     return <CookingMode recipe={recipe} onExit={() => setShowCookingMode(false)} />
   }
@@ -149,24 +168,30 @@ export const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe, onBack }) =>
           </button>
 
           <button
-            onClick={() => setShowNutrition(!showNutrition)}
+            onClick={toggleNutrition}
             className={`font-semibold py-4 px-6 rounded-3xl transition-all transform hover:scale-105 flex items-center justify-center gap-2 ${
               showNutrition
-                ? 'bg-gradient-to-r from-muted-blue-500 to-light-lavender-500 text-white'
-                : 'bg-muted-blue-100 hover:bg-muted-blue-200 text-muted-blue-700'
+                ? 'bg-gradient-to-r from-muted-blue-500 to-light-lavender-500 text-white shadow-lg'
+                : 'bg-muted-blue-100 hover:bg-muted-blue-200 text-muted-blue-700 border border-muted-blue-200'
             }`}
+            aria-expanded={showNutrition}
+            aria-controls="nutrition-section"
+            title={showNutrition ? 'Hide nutrition information' : 'Show nutrition information'}
           >
             <Activity className="w-5 h-5" />
             {showNutrition ? 'Hide Nutrition' : 'Show Nutrition'}
           </button>
 
           <button
-            onClick={() => setShowComments(!showComments)}
+            onClick={toggleComments}
             className={`font-semibold py-4 px-6 rounded-3xl transition-all transform hover:scale-105 flex items-center justify-center gap-2 ${
               showComments
-                ? 'bg-gradient-to-r from-light-lavender-500 to-dusty-pink-500 text-white'
-                : 'bg-light-lavender-100 hover:bg-light-lavender-200 text-light-lavender-700'
+                ? 'bg-gradient-to-r from-light-lavender-500 to-dusty-pink-500 text-white shadow-lg'
+                : 'bg-light-lavender-100 hover:bg-light-lavender-200 text-light-lavender-700 border border-light-lavender-200'
             }`}
+            aria-expanded={showComments}
+            aria-controls="comments-section"
+            title={showComments ? 'Hide comments and reviews' : 'Show comments and reviews'}
           >
             <MessageCircle className="w-5 h-5" />
             {showComments ? 'Hide Comments' : 'Show Comments'}
@@ -175,7 +200,12 @@ export const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe, onBack }) =>
 
         {/* Nutrition Section */}
         {showNutrition && (
-          <div className="mb-8">
+          <div 
+            className="mb-8 transition-all duration-300 ease-in-out transform" 
+            id="nutrition-section" 
+            role="region" 
+            aria-labelledby="nutrition-title"
+          >
             <NutritionInfo
               recipeId={recipe.id}
               ingredients={recipe.ingredients}
@@ -186,7 +216,12 @@ export const RecipeDetail: React.FC<RecipeDetailProps> = ({ recipe, onBack }) =>
 
         {/* Comments Section */}
         {showComments && (
-          <div className="mb-8">
+          <div 
+            className="mb-8 transition-all duration-300 ease-in-out transform" 
+            id="comments-section" 
+            role="region" 
+            aria-labelledby="comments-title"
+          >
             <CommentsSection recipeId={recipe.id} />
           </div>
         )}

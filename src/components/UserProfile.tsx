@@ -94,7 +94,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => 
 
     setLoading(true)
     try {
-      // Update profile
+      // Update profile with new data including avatar
       const updatedProfile = await userService.updateUserProfile(user.id, formData)
       if (updatedProfile) {
         setProfile(updatedProfile)
@@ -112,8 +112,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => 
       }
       
       setIsEditing(false)
+      
+      // Show success feedback
+      if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100])
+      }
     } catch (error) {
       console.error('Error updating profile:', error)
+      alert('Failed to save profile. Please try again.')
     } finally {
       setLoading(false)
     }

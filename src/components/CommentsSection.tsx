@@ -129,7 +129,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({ recipeId }) =>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <MessageCircle className="w-6 h-6 text-muted-blue-500" />
-          <h2 className="text-2xl font-bold text-soft-brown-900">
+          <h2 id="comments-title" className="text-2xl font-bold text-soft-brown-900">
             Comments ({comments.length})
           </h2>
         </div>

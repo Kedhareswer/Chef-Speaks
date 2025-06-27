@@ -115,7 +115,7 @@ export const NutritionInfo: React.FC<NutritionInfoProps> = ({
     <div className={`glass-organic rounded-3xl p-6 border border-warm-green-200/50 ${className}`}>
       <div className="flex items-center gap-3 mb-6">
         <Activity className="w-6 h-6 text-warm-green-500" />
-        <h3 className="text-lg font-semibold text-soft-brown-900">Nutrition Facts</h3>
+        <h3 id="nutrition-title" className="text-lg font-semibold text-soft-brown-900">Nutrition Facts</h3>
         {servings > 1 && (
           <span className="text-sm text-soft-brown-500 bg-soft-brown-100 px-2 py-1 rounded-pill">
             Per serving ({servings} servings)

@@ -22,6 +22,7 @@ import { parseVoiceCommand, filterRecipesByVoiceCommand } from './utils/voiceCom
 import { recipeService } from './services/recipeService';
 import { userService } from './services/userService';
 import { checkAndSeedDatabase } from './data/seedData';
+import { storageService } from './services/storageService';
 
 type ViewMode = 'discover' | 'ingredients' | 'community' | 'trending';
 
@@ -178,6 +179,14 @@ function App() {
     
     try {
       console.log('Initializing ChefSpeak app...');
+      
+      // Initialize storage buckets
+      try {
+        await storageService.initializeBuckets();
+        console.log('Storage buckets initialized');
+      } catch (storageError) {
+        console.warn('Storage bucket initialization failed, but continuing:', storageError);
+      }
       
       // Check and seed database if needed (this may fail due to RLS, but that's okay)
       try {
