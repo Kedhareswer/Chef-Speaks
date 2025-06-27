@@ -458,7 +458,7 @@ npm run lint
 
 | Platform | Status | URL | Features |
 |----------|--------|-----|----------|
-| **Netlify** | ✅ Active | [chefspeak.netlify.app](https://chefspeak.netlify.app) | Auto-deploy, CDN |
+| **Netlify** | ✅ Active | [chefspeak.netlify.app](https://chefspeaks.netlify.app) | Auto-deploy, CDN |
 | **Vercel** | 🔶 Ready | - | Edge functions |
 | **Supabase** | 🔶 Ready | - | Full-stack |
 
