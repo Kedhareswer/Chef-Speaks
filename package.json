@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "translate": "npx lingo.dev@latest i18n"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
