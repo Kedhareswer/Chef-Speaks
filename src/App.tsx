@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ChefHat, MapPin, Sparkles, Users, TrendingUp, Clock, Star, Flame, Globe, Menu, X, User, LogIn, Calendar, ShoppingCart } from 'lucide-react';
 import { Recipe } from './types';
 import { useVoiceRecognition } from './hooks/useVoiceRecognition';
@@ -37,18 +37,109 @@ function App() {
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastProcessedTranscript, setLastProcessedTranscript] = useState<string>('');
 
   const { location, loading: locationLoading } = useLocation();
   const { isListening, transcript, startListening, stopListening, isSupported } = useVoiceRecognition();
   const { speak, stop: stopSpeaking, isSpeaking } = useSpeechSynthesis();
   const { user, loading: authLoading } = useAuth();
 
-  // Load recipes on component mount
-  useEffect(() => {
-    initializeApp();
-  }, []);
+  // Enhanced voice command handling with debouncing and transcript clearing
+  const handleSearchInternal = useCallback(async (query: string) => {
+    setSearchQuery(query);
+    
+    try {
+      const searchResults = await recipeService.searchRecipes(query);
+      setFilteredRecipes(searchResults);
+      
+      if (searchResults.length > 0) {
+        const message = searchResults.length === 1 
+          ? `Found 1 recipe for ${query}` 
+          : `Found ${searchResults.length} recipes for ${query}`;
+        speak(message);
+      } else {
+        speak(`No recipes found for ${query}. Try searching for something else.`);
+      }
+    } catch (error) {
+      console.error('Error searching recipes:', error);
+      speak('Sorry, there was an error searching for recipes.');
+    }
+  }, [speak]);
 
-  const initializeApp = async () => {
+  // Voice command handling with proper dependencies
+  const handleVoiceCommandWithSearch = useCallback(async (transcript: string) => {
+    if (!transcript || transcript === lastProcessedTranscript) {
+      return; // Prevent processing same transcript multiple times
+    }
+
+    try {
+      console.log('Processing voice command:', transcript);
+      setLastProcessedTranscript(transcript);
+
+      const command = parseVoiceCommand(transcript);
+      
+      // Handle different command types
+      switch (command.action) {
+        case 'search': {
+          if (command.query) {
+            await handleSearchInternal(command.query);
+          }
+          break;
+        }
+          
+        case 'filter': {
+          const filtered = filterRecipesByVoiceCommand(allRecipes, command);
+          setFilteredRecipes(filtered);
+          
+          if (command.message) {
+            speak(command.message);
+          }
+          break;
+        }
+          
+        case 'help': {
+          if (command.message) {
+            speak(command.message);
+          }
+          break;
+        }
+          
+        default: {
+          // Default search behavior
+          if (command.query) {
+            await handleSearchInternal(command.query);
+          } else if (command.message) {
+            speak(command.message);
+          }
+          break;
+        }
+      }
+    } catch (error) {
+      console.error('Error processing voice command:', error);
+      speak('Sorry, I had trouble processing that command. Please try again.');
+    }
+  }, [allRecipes, lastProcessedTranscript, speak, handleSearchInternal]);
+
+  // Handle voice commands with improved debouncing
+  useEffect(() => {
+    if (transcript && transcript.trim()) {
+      // Debounce voice command processing
+      const timeoutId = setTimeout(() => {
+        handleVoiceCommandWithSearch(transcript.trim());
+      }, 1000); // Wait 1 second after user stops speaking
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [transcript, handleVoiceCommandWithSearch]);
+
+  // Clear processed transcript when starting new listening session
+  useEffect(() => {
+    if (isListening) {
+      setLastProcessedTranscript('');
+    }
+  }, [isListening]);
+
+  const initializeAppWithDeps = useCallback(async () => {
     setLoading(true);
     setError(null);
     
@@ -72,7 +163,35 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Load recipes on component mount
+  useEffect(() => {
+    initializeAppWithDeps();
+  }, [initializeAppWithDeps]);
+
+  const loadLocationRecipesWithDeps = useCallback(async () => {
+    if (!location) return;
+    
+    try {
+      const locationRecipes = await recipeService.getRecipesByCuisine(location.country);
+      if (locationRecipes.length > 0) {
+        setFilteredRecipes(locationRecipes);
+        speak(`Found ${locationRecipes.length} local recipes for you in ${location.city}`);
+      }
+    } catch (error) {
+      console.error('Error loading location recipes:', error);
+    }
+  }, [location, speak]);
+
+  // Load location-based recipes
+  useEffect(() => {
+    if (location && !searchQuery && viewMode === 'discover' && showLocalSuggestions) {
+      loadLocationRecipesWithDeps();
+    }
+  }, [location, searchQuery, viewMode, showLocalSuggestions, loadLocationRecipesWithDeps]);
+
+  const handleSearch = handleSearchInternal;
 
   const loadRecipes = async () => {
     try {
@@ -94,62 +213,12 @@ function App() {
     }
   };
 
-  // Handle voice commands
-  useEffect(() => {
-    if (transcript) {
-      const command = parseVoiceCommand(transcript);
-      const filtered = filterRecipesByVoiceCommand(allRecipes, command);
-      setFilteredRecipes(filtered);
-      
-      if (command.message) {
-        speak(command.message);
-      }
-    }
-  }, [transcript, allRecipes, speak]);
-
-  // Load location-based recipes
-  useEffect(() => {
-    if (location && !searchQuery && viewMode === 'discover' && showLocalSuggestions) {
-      loadLocationRecipes();
-    }
-  }, [location, searchQuery, viewMode, showLocalSuggestions]);
-
-  const loadLocationRecipes = async () => {
-    if (!location) return;
-    
-    try {
-      const locationRecipes = await recipeService.getRecipesByCuisine(location.country);
-      if (locationRecipes.length > 0) {
-        setFilteredRecipes(locationRecipes);
-        speak(`Found ${locationRecipes.length} local recipes for you in ${location.city}`);
-      }
-    } catch (error) {
-      console.error('Error loading location recipes:', error);
-    }
-  };
-
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    
-    try {
-      const searchResults = await recipeService.searchRecipes(query);
-      setFilteredRecipes(searchResults);
-      
-      if (searchResults.length > 0) {
-        speak(`Found ${searchResults.length} recipes matching ${query}`);
-      } else {
-        speak(`No recipes found for ${query}. Try searching for something else.`);
-      }
-    } catch (error) {
-      console.error('Error searching recipes:', error);
-      speak('Sorry, there was an error searching for recipes.');
-    }
-  };
-
   const handleVoiceSearch = () => {
     if (isListening) {
       stopListening();
     } else {
+      // Clear any previous state before starting
+      setLastProcessedTranscript('');
       startListening();
       speak("I'm listening. What would you like to cook?");
     }
@@ -163,6 +232,8 @@ function App() {
   const handleBackToList = () => {
     setSelectedRecipe(null);
     stopSpeaking();
+    // Clear voice state when going back
+    setLastProcessedTranscript('');
   };
 
   const handleRecipesUpdate = (recipes: Recipe[]) => {

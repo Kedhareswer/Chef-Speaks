@@ -53,13 +53,13 @@ export const parseVoiceCommand = (transcript: string): VoiceCommandResult => {
 
 const extractRecipeQuery = (transcript: string): string => {
   // Extract recipe name from "recipe for X" or "how to make X"
-  let query = transcript.replace(/recipe for|how to make|show me|find/gi, '').trim();
+  const query = transcript.replace(/recipe for|how to make|show me|find/gi, '').trim();
   return query || 'recipes';
 };
 
 const extractGeneralQuery = (transcript: string): string => {
   // Extract search terms from general commands
-  let query = transcript.replace(/find|search|show me|give me|i want/gi, '').trim();
+  const query = transcript.replace(/find|search|show me|give me|i want/gi, '').trim();
   return query || 'recipes';
 };
 
