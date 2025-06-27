@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChefHat, MapPin, Sparkles, Users, TrendingUp, Clock, Star, Flame, Globe, Menu, X, User, LogIn, Calendar, ShoppingCart } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Recipe } from './types';
 import { useVoiceRecognition } from './hooks/useVoiceRecognition';
 import { useLocation } from './hooks/useLocation';
@@ -19,11 +20,13 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { AppLoadingSkeleton, SearchResultsSkeleton } from './components/SkeletonLoaders';
 import { parseVoiceCommand, filterRecipesByVoiceCommand } from './utils/voiceCommands';
 import { recipeService } from './services/recipeService';
+import { userService } from './services/userService';
 import { checkAndSeedDatabase } from './data/seedData';
 
 type ViewMode = 'discover' | 'ingredients' | 'community' | 'trending';
 
 function App() {
+  const { t, i18n } = useTranslation();
   const [allRecipes, setAllRecipes] = useState<Recipe[]>([]);
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -39,11 +42,40 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastProcessedTranscript, setLastProcessedTranscript] = useState<string>('');
+  const [userLanguage, setUserLanguage] = useState<string>('en');
 
   const { location, loading: locationLoading } = useLocation();
-  const { isListening, transcript, startListening, stopListening, isSupported } = useVoiceRecognition();
+  const { isListening, transcript, startListening, stopListening, isSupported, setLanguage } = useVoiceRecognition();
   const { speak, stop: stopSpeaking, isSpeaking } = useSpeechSynthesis();
   const { user, loading: authLoading } = useAuth();
+
+  // Load user's language preference and sync with voice recognition
+  useEffect(() => {
+    if (user) {
+      loadUserLanguage();
+    }
+  }, [user]);
+
+  // Update voice recognition language when user language changes
+  useEffect(() => {
+    setLanguage(userLanguage);
+  }, [userLanguage, setLanguage]);
+
+  const loadUserLanguage = async () => {
+    if (!user) return;
+    
+    try {
+      const profile = await userService.getUserProfile(user.id);
+      if (profile?.preferredLanguage) {
+        const newLanguage = profile.preferredLanguage;
+        setUserLanguage(newLanguage);
+        i18n.changeLanguage(newLanguage);
+        console.log(`User language loaded: ${newLanguage}`);
+      }
+    } catch (error) {
+      console.error('Error loading user language:', error);
+    }
+  };
 
   // Enhanced voice command handling with debouncing and transcript clearing
   const handleSearchInternal = useCallback(async (query: string) => {
@@ -55,17 +87,17 @@ function App() {
       
       if (searchResults.length > 0) {
         const message = searchResults.length === 1 
-          ? `Found 1 recipe for ${query}` 
-          : `Found ${searchResults.length} recipes for ${query}`;
+          ? t('searchResults.foundOne', { query, defaultValue: `Found 1 recipe for ${query}` })
+          : t('searchResults.foundMany', { count: searchResults.length, query, defaultValue: `Found ${searchResults.length} recipes for ${query}` });
         speak(message);
       } else {
-        speak(`No recipes found for ${query}. Try searching for something else.`);
+        speak(t('searchResults.notFound', { query, defaultValue: `No recipes found for ${query}. Try searching for something else.` }));
       }
     } catch (error) {
       console.error('Error searching recipes:', error);
-      speak('Sorry, there was an error searching for recipes.');
+      speak(t('errors.searchError', { defaultValue: 'Sorry, there was an error searching for recipes.' }));
     }
-  }, [speak]);
+  }, [speak, t]);
 
   // Voice command handling with proper dependencies
   const handleVoiceCommandWithSearch = useCallback(async (transcript: string) => {
@@ -117,9 +149,9 @@ function App() {
       }
     } catch (error) {
       console.error('Error processing voice command:', error);
-      speak('Sorry, I had trouble processing that command. Please try again.');
+      speak(t('errors.voiceCommandError', { defaultValue: 'Sorry, I had trouble processing that command. Please try again.' }));
     }
-  }, [allRecipes, lastProcessedTranscript, speak, handleSearchInternal]);
+  }, [allRecipes, lastProcessedTranscript, speak, handleSearchInternal, t]);
 
   // Handle voice commands with improved debouncing
   useEffect(() => {
@@ -178,12 +210,12 @@ function App() {
       const locationRecipes = await recipeService.getRecipesByCuisine(location.country);
       if (locationRecipes.length > 0) {
         setFilteredRecipes(locationRecipes);
-        speak(`Found ${locationRecipes.length} local recipes for you in ${location.city}`);
+        speak(t('locationRecipes.found', { count: locationRecipes.length, city: location.city }));
       }
     } catch (error) {
       console.error('Error loading location recipes:', error);
     }
-  }, [location, speak]);
+  }, [location, speak, t]);
 
   // Load location-based recipes
   useEffect(() => {
@@ -221,13 +253,13 @@ function App() {
       // Clear any previous state before starting
       setLastProcessedTranscript('');
       startListening();
-      speak("I'm listening. What would you like to cook?");
+      speak(t('voiceAssistant.listening', { defaultValue: "I'm listening. What would you like to cook?" }));
     }
   };
 
   const handleRecipeSelect = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
-    speak(`Here's the recipe for ${recipe.title}. It takes ${recipe.cookTime} minutes to cook and serves ${recipe.servings} people.`);
+    speak(t('recipeSelected', { recipeTitle: recipe.title, cookTime: recipe.cookTime, servings: recipe.servings }));
   };
 
   const handleBackToList = () => {
@@ -370,7 +402,7 @@ function App() {
                 aria-current={viewMode === 'discover' ? 'page' : undefined}
               >
                 <Sparkles className="w-4 h-4" />
-                Discover
+                {t('discover')}
               </button>
               <button
                 onClick={() => handleViewModeChange('trending')}
@@ -382,7 +414,7 @@ function App() {
                 aria-current={viewMode === 'trending' ? 'page' : undefined}
               >
                 <TrendingUp className="w-4 h-4" />
-                Trending
+                {t('trending')}
               </button>
               <button
                 onClick={() => handleViewModeChange('ingredients')}
@@ -394,7 +426,7 @@ function App() {
                 aria-current={viewMode === 'ingredients' ? 'page' : undefined}
               >
                 <ChefHat className="w-4 h-4" />
-                By Ingredients
+                {t('byIngredients')}
               </button>
               <button
                 onClick={() => handleViewModeChange('community')}
@@ -406,7 +438,7 @@ function App() {
                 aria-current={viewMode === 'community' ? 'page' : undefined}
               >
                 <Users className="w-4 h-4" />
-                Community
+                {t('community')}
               </button>
             </nav>
 
@@ -418,18 +450,18 @@ function App() {
                   <button
                     onClick={() => setShowMealPlan(true)}
                     className="flex items-center gap-2 text-gray-700 hover:text-muted-blue-600 px-4 py-3 rounded-lg font-medium transition-colors min-h-[44px]"
-                    title="Meal Planning"
+                    title={t('mealPlan')}
                   >
                     <Calendar className="w-4 h-4" />
-                    <span className="hidden lg:inline">Meal Plan</span>
+                    <span className="hidden lg:inline">{t('mealPlan')}</span>
                   </button>
                   <button
                     onClick={() => setShowShoppingList(true)}
                     className="flex items-center gap-2 text-gray-700 hover:text-light-lavender-600 px-4 py-3 rounded-lg font-medium transition-colors min-h-[44px]"
-                    title="Shopping Lists"
+                    title={t('shopping')}
                   >
                     <ShoppingCart className="w-4 h-4" />
-                    <span className="hidden lg:inline">Shopping</span>
+                    <span className="hidden lg:inline">{t('shopping')}</span>
                   </button>
                 </div>
               )}
@@ -441,7 +473,7 @@ function App() {
                   className="flex items-center gap-2 bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-6 py-3 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all min-h-[44px]"
                 >
                   <User className="w-4 h-4" />
-                  <span className="hidden sm:inline">Profile</span>
+                  <span className="hidden sm:inline">{t('profile')}</span>
                 </button>
               ) : (
                 <div className="hidden md:flex items-center gap-2">
@@ -450,13 +482,13 @@ function App() {
                     className="flex items-center gap-2 text-gray-700 hover:text-warm-green-600 px-4 py-3 rounded-lg font-medium transition-colors min-h-[44px]"
                   >
                     <LogIn className="w-4 h-4" />
-                    Sign In
+                    {t('signIn')}
                   </button>
                   <button
                     onClick={() => handleAuthClick('signup')}
                     className="bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-6 py-3 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all min-h-[44px]"
                   >
-                    Sign Up
+                    {t('signUp')}
                   </button>
                 </div>
               )}
@@ -498,7 +530,7 @@ function App() {
                   aria-current={viewMode === 'discover' ? 'page' : undefined}
                 >
                   <Sparkles className="w-6 h-6" />
-                  <span className="text-lg">Discover Recipes</span>
+                  <span className="text-lg">{t('discover')} {t('recipes', { defaultValue: 'Recipes' })}</span>
                 </button>
                 <button
                   onClick={() => handleViewModeChange('trending')}
@@ -510,7 +542,7 @@ function App() {
                   aria-current={viewMode === 'trending' ? 'page' : undefined}
                 >
                   <TrendingUp className="w-6 h-6" />
-                  <span className="text-lg">Trending Recipes</span>
+                  <span className="text-lg">{t('trending')} {t('recipes', { defaultValue: 'Recipes' })}</span>
                 </button>
                 <button
                   onClick={() => handleViewModeChange('ingredients')}
@@ -522,7 +554,7 @@ function App() {
                   aria-current={viewMode === 'ingredients' ? 'page' : undefined}
                 >
                   <ChefHat className="w-6 h-6" />
-                  <span className="text-lg">Find by Ingredients</span>
+                  <span className="text-lg">{t('byIngredients')}</span>
                 </button>
                 <button
                   onClick={() => handleViewModeChange('community')}
@@ -534,56 +566,53 @@ function App() {
                   aria-current={viewMode === 'community' ? 'page' : undefined}
                 >
                   <Users className="w-6 h-6" />
-                  <span className="text-lg">Community Recipes</span>
+                  <span className="text-lg">{t('community')} {t('recipes', { defaultValue: 'Recipes' })}</span>
                 </button>
 
-                {/* Mobile User Tools */}
-                {user && (
-                  <div className="pt-4 border-t border-gray-200 mt-4">
+                {/* Mobile Auth Actions */}
+                {!user && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
                     <button
-                      onClick={() => {
-                        setShowMealPlan(true);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-4 px-6 py-4 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-all text-left min-h-[52px]"
+                      onClick={() => handleAuthClick('signin')}
+                      className="w-full flex items-center gap-4 px-6 py-4 rounded-xl font-medium text-gray-700 hover:bg-gray-100 transition-all text-left min-h-[52px]"
                     >
-                      <Calendar className="w-6 h-6" />
-                      <span className="text-lg">Meal Planning</span>
+                      <LogIn className="w-6 h-6" />
+                      <span className="text-lg">{t('signIn')}</span>
                     </button>
                     <button
-                      onClick={() => {
-                        setShowShoppingList(true);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-4 px-6 py-4 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-all text-left min-h-[52px]"
+                      onClick={() => handleAuthClick('signup')}
+                      className="w-full bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-6 py-4 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all min-h-[52px]"
                     >
-                      <ShoppingCart className="w-6 h-6" />
-                      <span className="text-lg">Shopping Lists</span>
+                      <span className="text-lg">{t('signUp')}</span>
                     </button>
                   </div>
                 )}
 
-                {/* Mobile Auth */}
-                {!user && (
-                  <div className="pt-4 border-t border-gray-200 mt-4 space-y-3">
+                {/* Mobile User Tools */}
+                {user && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
                     <button
-                      onClick={() => {
-                        handleAuthClick('signin');
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-4 px-6 py-4 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-all text-left min-h-[52px]"
+                      onClick={() => setShowMealPlan(true)}
+                      className="w-full flex items-center gap-4 px-6 py-4 rounded-xl font-medium text-gray-700 hover:bg-gray-100 transition-all text-left min-h-[52px]"
                     >
-                      <LogIn className="w-6 h-6" />
-                      <span className="text-lg">Sign In</span>
+                      <Calendar className="w-6 h-6" />
+                      <span className="text-lg">{t('mealPlan')}</span>
                     </button>
                     <button
-                      onClick={() => {
-                        handleAuthClick('signup');
-                        setIsMobileMenuOpen(false);
-                      }}
+                      onClick={() => setShowShoppingList(true)}
+                      className="w-full flex items-center gap-4 px-6 py-4 rounded-xl font-medium text-gray-700 hover:bg-gray-100 transition-all text-left min-h-[52px]"
+                    >
+                      <ShoppingCart className="w-6 h-6" />
+                      <span className="text-lg">{t('shopping')}</span>
+                    </button>
+                    <button
+                      onClick={() => setShowUserProfile(true)}
                       className="w-full bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-6 py-4 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all min-h-[52px]"
                     >
-                      <span className="text-lg">Sign Up</span>
+                      <div className="flex items-center gap-4">
+                        <User className="w-6 h-6" />
+                        <span className="text-lg">{t('profile')}</span>
+                      </div>
                     </button>
                   </div>
                 )}

@@ -32,6 +32,22 @@
   "startCooking": "వంట ప్రారంభించండి",
   "shareRecipe": "వంటకాన్ని షేర్ చేయండి",
   "viewRecipe": "వంటకాన్ని చూడండి",
+  "searchResults": {
+    "foundOne": "{{query}} కోసం 1 వంటకం దొరికింది",
+    "foundMany": "{{query}} కోసం {{count}} వంటకాలు దొరికాయి",
+    "notFound": "{{query}} కోసం వంటకాలు దొరకలేదు. వేరేదాన్ని వెతకండి."
+  },
+  "errors": {
+    "searchError": "క్షమించండి, వంటకాలు వెతకడంలో లోపం జరిగింది.",
+    "voiceCommandError": "క్షమించండి, ఆ కమాండ్‌ను ప్రాసెస్ చేయడంలో సమస్య ఉంది. దయచేసి మళ్లీ ప్రయత్నించండి."
+  },
+  "locationRecipes": {
+    "found": "{{city}}లో మీ కోసం {{count}} స్థానిక వంటకాలు దొరికాయి"
+  },
+  "voiceAssistant": {
+    "listening": "నేను వింటున్నాను. మీరు ఏం వండాలని అనుకుంటున్నారు?"
+  },
+  "recipeSelected": "ఇది {{recipeTitle}} వంటకం. దీన్ని వండటానికి {{cookTime}} నిమిషాలు పడుతుంది మరియు {{servings}} మందికి సరిపోతుంది.",
   "voiceCommands": {
     "nextStep": "తదుపరి దశ",
     "previousStep": "మునుపటి దశ",

@@ -32,6 +32,22 @@
   "startCooking": "Comenzar a Cocinar",
   "shareRecipe": "Compartir Receta",
   "viewRecipe": "Ver Receta",
+  "searchResults": {
+    "foundOne": "Se encontró 1 receta para {{query}}",
+    "foundMany": "Se encontraron {{count}} recetas para {{query}}",
+    "notFound": "No se encontraron recetas para {{query}}. Intenta buscar algo diferente."
+  },
+  "errors": {
+    "searchError": "Lo siento, hubo un error al buscar recetas.",
+    "voiceCommandError": "Lo siento, tuve problemas procesando ese comando. Por favor intenta de nuevo."
+  },
+  "locationRecipes": {
+    "found": "Se encontraron {{count}} recetas locales para ti en {{city}}"
+  },
+  "voiceAssistant": {
+    "listening": "Estoy escuchando. ¿Qué te gustaría cocinar?"
+  },
+  "recipeSelected": "Aquí está la receta para {{recipeTitle}}. Toma {{cookTime}} minutos cocinar y sirve a {{servings}} personas.",
   "voiceCommands": {
     "nextStep": "Siguiente paso",
     "previousStep": "Paso anterior",

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mic, MicOff, Volume2, Sparkles, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface VoiceButtonProps {
   isListening: boolean;
@@ -16,6 +17,8 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
   onStopSpeaking,
   disabled = false
 }) => {
+  const { t } = useTranslation();
+  
   const handleVibration = () => {
     // Haptic feedback for mobile devices
     if ('vibrate' in navigator) {
@@ -41,7 +44,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
           <button
             onClick={handleStopSpeaking}
             className="bg-gradient-to-r from-muted-blue-500 to-light-lavender-500 hover:from-muted-blue-600 hover:to-light-lavender-600 text-white p-4 md:p-4 rounded-full shadow-soft-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 border-4 border-white/50 backdrop-blur-sm animate-organic-float min-h-[56px] min-w-[56px] md:min-h-[64px] md:min-w-[64px]"
-            aria-label="Stop speaking"
+            aria-label={t('voiceButton.stopSpeaking', { defaultValue: 'Stop speaking' })}
           >
             <Volume2 className="w-6 h-6 md:w-7 md:h-7" />
           </button>
@@ -60,7 +63,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
               }
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
-            aria-label={isListening ? 'Stop listening' : 'Start voice command'}
+            aria-label={isListening ? t('voiceButton.stopListening', { defaultValue: 'Stop listening' }) : t('voiceButton.startVoiceCommand', { defaultValue: 'Start voice command' })}
           >
             {isListening ? (
               <div className="relative">
@@ -103,8 +106,8 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
                   <div className="w-1 h-4 md:h-6 organic-wave"></div>
                 </div>
                 <div>
-                  <div className="font-semibold text-warm-green-600 text-sm md:text-base">AI Listening...</div>
-                  <div className="text-xs text-soft-brown-500">Speak your recipe request</div>
+                  <div className="font-semibold text-warm-green-600 text-sm md:text-base">{t('voiceButton.aiListening', { defaultValue: 'AI Listening...' })}</div>
+                  <div className="text-xs text-soft-brown-500">{t('speakYourRequest')}</div>
                 </div>
               </>
             )}
@@ -112,8 +115,8 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
               <>
                 <Volume2 className="w-5 h-5 md:w-6 md:h-6 text-muted-blue-500 animate-soft-pulse" />
                 <div>
-                  <div className="font-semibold text-muted-blue-600 text-sm md:text-base">ChefSpeak AI</div>
-                  <div className="text-xs text-soft-brown-500">Responding to your request</div>
+                  <div className="font-semibold text-muted-blue-600 text-sm md:text-base">{t('voiceButton.chefSpeakAI', { defaultValue: 'ChefSpeak AI' })}</div>
+                  <div className="text-xs text-soft-brown-500">{t('voiceButton.responding', { defaultValue: 'Responding to your request' })}</div>
                 </div>
               </>
             )}
@@ -124,11 +127,11 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
       {/* Quick Voice Commands Hint */}
       {isListening && (
         <div className="absolute -top-32 md:-top-40 right-0 bg-white/95 backdrop-blur-sm text-gray-700 px-3 md:px-4 py-2 md:py-3 rounded-2xl md:rounded-3xl shadow-lg border border-gray-200 min-w-[180px] md:min-w-[200px]">
-          <div className="text-xs md:text-sm font-medium mb-1">Try saying:</div>
+          <div className="text-xs md:text-sm font-medium mb-1">{t('voiceButton.trySaying', { defaultValue: 'Try saying:' })}</div>
           <div className="text-xs text-gray-500 space-y-0.5">
-            <div>"Show me pasta recipes"</div>
-            <div>"Quick dinner ideas"</div>
-            <div>"Vegetarian meals"</div>
+            <div>"{t('voiceButton.examplePasta', { defaultValue: 'Show me pasta recipes' })}"</div>
+            <div>"{t('voiceButton.exampleQuick', { defaultValue: 'Quick dinner ideas' })}"</div>
+            <div>"{t('voiceButton.exampleVegetarian', { defaultValue: 'Vegetarian meals' })}"</div>
           </div>
         </div>
       )}

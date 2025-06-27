@@ -32,6 +32,47 @@
   "startCooking": "Start Cooking",
   "shareRecipe": "Share Recipe",
   "viewRecipe": "View Recipe",
+  "recipes": "Recipes",
+  "searchResults": {
+    "foundOne": "Found 1 recipe for {{query}}",
+    "foundMany": "Found {{count}} recipes for {{query}}",
+    "notFound": "No recipes found for {{query}}. Try searching for something else."
+  },
+  "errors": {
+    "searchError": "Sorry, there was an error searching for recipes.",
+    "voiceCommandError": "Sorry, I had trouble processing that command. Please try again."
+  },
+  "locationRecipes": {
+    "found": "Found {{count}} local recipes for you in {{city}}"
+  },
+  "voiceAssistant": {
+    "listening": "I'm listening. What would you like to cook?"
+  },
+  "recipeSelected": "Here's the recipe for {{recipeTitle}}. It takes {{cookTime}} minutes to cook and serves {{servings}} people.",
+  "voiceButton": {
+    "stopSpeaking": "Stop speaking",
+    "stopListening": "Stop listening",
+    "startVoiceCommand": "Start voice command",
+    "aiListening": "AI Listening...",
+    "chefSpeakAI": "ChefSpeak AI",
+    "responding": "Responding to your request",
+    "trySaying": "Try saying:",
+    "examplePasta": "Show me pasta recipes",
+    "exampleQuick": "Quick dinner ideas",
+    "exampleVegetarian": "Vegetarian meals"
+  },
+  "searchBar": {
+    "clearSearch": "Clear search",
+    "voiceSearch": "Voice search",
+    "recipesNear": "Recipes near {{location}}",
+    "tryExamples": "Try: \"Italian pasta\", \"Quick dinner\", or \"Vegetarian\"",
+    "popularSearches": "Popular Searches",
+    "suggestion1": "Italian pasta",
+    "suggestion2": "Quick breakfast",
+    "suggestion3": "Healthy salads",
+    "suggestion4": "Vegetarian dinner",
+    "suggestion5": "Dessert recipes"
+  },
   "voiceCommands": {
     "nextStep": "Next step",
     "previousStep": "Previous step",

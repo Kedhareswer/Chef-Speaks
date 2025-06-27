@@ -32,6 +32,23 @@
   "startCooking": "खाना बनाना शुरू करें",
   "shareRecipe": "व्यंजन साझा करें",
   "viewRecipe": "व्यंजन देखें",
+  "recipes": "व्यंजन",
+  "searchResults": {
+    "foundOne": "{{query}} के लिए 1 रेसिपी मिली",
+    "foundMany": "{{query}} के लिए {{count}} रेसिपी मिलीं",
+    "notFound": "{{query}} के लिए कोई रेसिपी नहीं मिली। कुछ और खोजने की कोशिश करें।"
+  },
+  "errors": {
+    "searchError": "माफ़ करें, रेसिपी खोजने में त्रुटि हुई।",
+    "voiceCommandError": "माफ़ करें, उस कमांड को प्रोसेस करने में समस्या हुई। कृपया फिर से कोशिश करें।"
+  },
+  "locationRecipes": {
+    "found": "{{city}} में आपके लिए {{count}} स्थानीय रेसिपी मिलीं"
+  },
+  "voiceAssistant": {
+    "listening": "मैं सुन रहा हूँ। आप क्या पकाना चाहते हैं?"
+  },
+  "recipeSelected": "यहाँ {{recipeTitle}} की रेसिपी है। इसे पकाने में {{cookTime}} मिनट लगते हैं और {{servings}} लोगों के लिए है।",
   "voiceCommands": {
     "nextStep": "अगला कदम",
     "previousStep": "पिछला कदम",
