@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, ChefHat, Sparkles, MapPin, Search, Filter, Zap, Loader, AlertCircle } from 'lucide-react';
+import { Plus, X, ChefHat, Sparkles, MapPin, Search, Filter, Zap, Loader, AlertCircle, Mic, ShoppingCart, BookOpen } from 'lucide-react';
 import { commonIngredients, suggestPairings } from '../data/ingredients';
 import { Recipe } from '../types';
 import { spoonacularService } from '../services/spoonacularService';
 import { recipeService } from '../services/recipeService';
+import { shoppingListService } from '../services/shoppingListService';
+import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
+import { useEnhancedSpeechSynthesis } from '../hooks/useEnhancedSpeechSynthesis';
+import { parseVoiceCommand } from '../utils/voiceCommands';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../hooks/useAuth';
 
 interface IngredientSelectorProps {
   onRecipesFound: (recipes: Recipe[]) => void;
@@ -18,6 +24,10 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
   showLocalSuggestions,
   location
 }) => {
+  const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const { speak, isSpeaking } = useEnhancedSpeechSynthesis();
+  
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestedPairings, setSuggestedPairings] = useState<string[]>([]);
@@ -27,6 +37,22 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
   const [useSpoonacular, setUseSpoonacular] = useState(true);
   const [apiAvailable, setApiAvailable] = useState(true);
   const [searchError, setSearchError] = useState<string | null>(null);
+  
+  // Voice recognition
+  const voiceRecognition = useVoiceRecognition(i18n.language);
+  const [voiceStatus, setVoiceStatus] = useState<string>('');
+  const [conversationContext, setConversationContext] = useState<string | null>(null);
+  const [followUpQuestion, setFollowUpQuestion] = useState<string | null>(null);
+  const [voicePreferences, setVoicePreferences] = useState<{
+    dietary: string[];
+    cookTime?: number;
+    difficulty?: string;
+    mealType?: string;
+  }>({ dietary: [] });
+  
+  // Shopping list and narration state
+  const [isCreatingShoppingList, setIsCreatingShoppingList] = useState(false);
+  const [selectedRecipeForAction, setSelectedRecipeForAction] = useState<Recipe | null>(null);
 
   const categories = [
     { id: 'all', name: 'All', icon: '🍽️', color: 'from-soft-brown-500 to-soft-brown-600' },
@@ -55,6 +81,302 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
       setApiAvailable(false);
       setUseSpoonacular(false);
     }
+  };
+
+  // Handle voice commands
+  useEffect(() => {
+    if (voiceRecognition.transcript) {
+      const command = parseVoiceCommand(voiceRecognition.transcript);
+      setVoiceStatus(command.message || '');
+      
+      // Handle ingredients action
+      if (command.action === 'ingredients' && command.ingredients) {
+        // Add detected ingredients to selection
+        const newIngredients = command.ingredients.filter(
+          ingredient => !selectedIngredients.includes(ingredient)
+        );
+        
+        if (newIngredients.length > 0) {
+          setSelectedIngredients(prev => [...prev, ...newIngredients]);
+          
+          // Store voice preferences
+          setVoicePreferences({
+            dietary: command.dietaryRestrictions || [],
+            cookTime: command.cookTime,
+            difficulty: command.difficulty,
+            mealType: command.mealType
+          });
+          
+          setVoiceStatus(t('voice.ingredientsAdded', { 
+            ingredients: newIngredients.join(', '),
+            defaultValue: `Added ${newIngredients.join(', ')} to your ingredients`
+          }));
+        } else {
+          setVoiceStatus(t('voice.ingredientsAlreadySelected', {
+            defaultValue: 'Those ingredients are already selected'
+          }));
+        }
+        
+        // Set follow-up question and conversation context
+        if (command.followUpQuestion) {
+          setFollowUpQuestion(command.followUpQuestion);
+          setConversationContext(command.conversationContext || 'ingredient_search');
+        }
+      }
+      
+      // Handle conversation action (meal planning)
+      else if (command.action === 'conversation') {
+        setConversationContext(command.conversationContext || 'meal_planning');
+        setFollowUpQuestion(command.followUpQuestion || null);
+        
+        // Store preferences from conversation
+        setVoicePreferences({
+          dietary: command.dietaryRestrictions || [],
+          cookTime: command.cookTime,
+          difficulty: command.difficulty,
+          mealType: command.mealType
+        });
+        
+        // Add any mentioned ingredients
+        if (command.ingredients && command.ingredients.length > 0) {
+          const newIngredients = command.ingredients.filter(
+            ingredient => !selectedIngredients.includes(ingredient)
+          );
+          if (newIngredients.length > 0) {
+            setSelectedIngredients(prev => [...prev, ...newIngredients]);
+          }
+        }
+      }
+      
+      // Handle filter action (dietary restrictions, time-based, flavor-based)
+      else if (command.action === 'filter') {
+        setVoicePreferences(prev => ({
+          ...prev,
+          dietary: [...prev.dietary, ...(command.dietaryRestrictions || [])],
+          cookTime: command.cookTime || prev.cookTime,
+          difficulty: command.difficulty || prev.difficulty,
+          mealType: command.mealType || prev.mealType
+        }));
+        
+        setConversationContext(command.conversationContext || null);
+        setFollowUpQuestion(command.followUpQuestion || null);
+        
+        // Add any mentioned ingredients
+        if (command.ingredients && command.ingredients.length > 0) {
+          const newIngredients = command.ingredients.filter(
+            ingredient => !selectedIngredients.includes(ingredient)
+          );
+          if (newIngredients.length > 0) {
+            setSelectedIngredients(prev => [...prev, ...newIngredients]);
+          }
+        }
+        
+        // Apply filters to search
+        applyVoiceFilters(command);
+      }
+      
+      // Handle shopping list actions
+      else if (command.action === 'shopping_list') {
+        handleShoppingListCommand(command);
+      }
+      
+      // Handle recipe narration actions
+      else if (command.action === 'recipe_narration') {
+        handleRecipeNarrationCommand(command);
+      }
+      
+      // Clear status and follow-up after 5 seconds
+      setTimeout(() => {
+        setVoiceStatus('');
+        setFollowUpQuestion(null);
+        setConversationContext(null);
+      }, 5000);
+    }
+  }, [voiceRecognition.transcript, selectedIngredients, t]);
+
+  // Apply voice-based filters to recipe search
+  const applyVoiceFilters = (command: any) => {
+    // This function will be used to apply additional filters based on voice commands
+    // For now, the filtering is handled by the existing ingredient selection logic
+    console.log('Applying voice filters:', command);
+  };
+
+  // Handle shopping list voice commands
+  const handleShoppingListCommand = async (command: any) => {
+    if (!user) {
+      setVoiceStatus('Please sign in to use shopping list features');
+      speak('Please sign in to use shopping list features');
+      return;
+    }
+
+    setIsCreatingShoppingList(true);
+    
+    try {
+      if (command.shoppingListAction === 'add_missing') {
+        // Find missing ingredients from current recipe results
+        const currentRecipes = allRecipes.slice(0, 5); // Top 5 recipes
+        if (currentRecipes.length > 0) {
+          const missingIngredients = await findMissingIngredients(currentRecipes);
+          if (missingIngredients.length > 0) {
+            await addIngredientsToShoppingList(missingIngredients, 'Missing Ingredients');
+            setVoiceStatus(`Added ${missingIngredients.length} missing ingredients to your shopping list`);
+            speak(`Added ${missingIngredients.length} missing ingredients to your shopping list`);
+          } else {
+            setVoiceStatus('You have all the ingredients needed!');
+            speak('You have all the ingredients needed!');
+          }
+        }
+      }
+      
+      else if (command.shoppingListAction === 'create_from_recipe') {
+        // Create shopping list from selected ingredients/recipes
+        const currentRecipes = allRecipes.slice(0, 3); // Top 3 recipes
+        if (currentRecipes.length > 0) {
+          const listName = `Shopping List - ${new Date().toLocaleDateString()}`;
+          const result = await shoppingListService.generateShoppingListFromRecipes(
+            user.id, 
+            currentRecipes.map(r => r.id), 
+            listName
+          );
+          
+          if (result) {
+            setVoiceStatus(`Created shopping list with ${result.items.length} items`);
+            speak(`Created shopping list with ${result.items.length} items from your selected recipes`);
+          }
+        }
+      }
+      
+      else if (command.shoppingListAction === 'add_ingredients' && command.ingredients) {
+        await addIngredientsToShoppingList(command.ingredients, 'Voice Added Items');
+        setVoiceStatus(`Added ${command.ingredients.length} ingredients to your shopping list`);
+        speak(`Added ${command.ingredients.join(', ')} to your shopping list`);
+      }
+      
+    } catch (error) {
+      console.error('Shopping list error:', error);
+      setVoiceStatus('Sorry, there was an error with your shopping list');
+      speak('Sorry, there was an error with your shopping list');
+    } finally {
+      setIsCreatingShoppingList(false);
+    }
+  };
+
+  // Handle recipe narration voice commands
+  const handleRecipeNarrationCommand = async (command: any) => {
+    const currentRecipes = allRecipes.slice(0, 1); // Focus on top recipe
+    
+    if (currentRecipes.length === 0) {
+      setVoiceStatus('No recipe selected for narration');
+      speak('Please select a recipe first, then I can read it to you');
+      return;
+    }
+    
+    const recipe = currentRecipes[0];
+    setSelectedRecipeForAction(recipe);
+    
+    try {
+      if (command.narrationAction === 'read_recipe') {
+        await readCompleteRecipe(recipe);
+      }
+      else if (command.narrationAction === 'read_ingredients') {
+        await readRecipeIngredients(recipe);
+      }
+      else if (command.narrationAction === 'read_instructions') {
+        await readRecipeInstructions(recipe);
+      }
+      else if (command.narrationAction === 'read_nutrition') {
+        await readRecipeNutrition(recipe);
+      }
+    } catch (error) {
+      console.error('Recipe narration error:', error);
+      setVoiceStatus('Sorry, there was an error reading the recipe');
+      speak('Sorry, there was an error reading the recipe');
+    }
+  };
+
+  // Helper functions for shopping list
+  const findMissingIngredients = async (recipes: Recipe[]): Promise<string[]> => {
+    const allRecipeIngredients = new Set<string>();
+    
+    recipes.forEach(recipe => {
+      recipe.ingredients.forEach(ingredient => {
+        allRecipeIngredients.add(ingredient.toLowerCase().trim());
+      });
+    });
+    
+    const missing = Array.from(allRecipeIngredients).filter(ingredient => 
+      !selectedIngredients.some(selected => 
+        selected.toLowerCase().includes(ingredient) || 
+        ingredient.includes(selected.toLowerCase())
+      )
+    );
+    
+    return missing.slice(0, 10); // Limit to 10 missing ingredients
+  };
+
+  const addIngredientsToShoppingList = async (ingredients: string[], listName: string) => {
+    if (!user) return;
+    
+    const shoppingListItems = ingredients.map((ingredient, index) => ({
+      id: `voice-${Date.now()}-${index}`,
+      ingredient: ingredient,
+      quantity: 1,
+      unit: 'item',
+      checked: false
+    }));
+
+    await shoppingListService.createShoppingList(user.id, listName, shoppingListItems);
+  };
+
+  // Helper functions for recipe narration
+  const readCompleteRecipe = async (recipe: Recipe) => {
+    const text = `
+      Recipe: ${recipe.title}. 
+      Description: ${recipe.description}. 
+      Cook time: ${recipe.cookTime} minutes. 
+      Serves ${recipe.servings} people. 
+      Difficulty: ${recipe.difficulty}. 
+      Cuisine: ${recipe.cuisine}.
+      
+      Ingredients: ${recipe.ingredients.join(', ')}.
+      
+      Instructions: ${recipe.instructions.join('. ')}
+    `;
+    
+    setVoiceStatus('Reading complete recipe...');
+    await speak(text, i18n.language);
+  };
+
+  const readRecipeIngredients = async (recipe: Recipe) => {
+    const text = `
+      Ingredients for ${recipe.title}: 
+      ${recipe.ingredients.join(', ')}. 
+      This recipe serves ${recipe.servings} people.
+    `;
+    
+    setVoiceStatus('Reading ingredients...');
+    await speak(text, i18n.language);
+  };
+
+  const readRecipeInstructions = async (recipe: Recipe) => {
+    const text = `
+      Cooking instructions for ${recipe.title}: 
+      ${recipe.instructions.map((step, index) => `Step ${index + 1}: ${step}`).join('. ')}
+    `;
+    
+    setVoiceStatus('Reading cooking instructions...');
+    await speak(text, i18n.language);
+  };
+
+  const readRecipeNutrition = async (recipe: Recipe) => {
+    const text = `
+      Nutritional information for ${recipe.title}: 
+      This ${recipe.difficulty} ${recipe.cuisine} recipe takes ${recipe.cookTime} minutes to cook.
+      It's rated ${recipe.rating || 'not rated'} out of 5 stars.
+    `;
+    
+    setVoiceStatus('Reading nutritional information...');
+    await speak(text, i18n.language);
   };
 
   useEffect(() => {
@@ -324,10 +646,142 @@ export const IngredientSelector: React.FC<IngredientSelectorProps> = ({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search for ingredients..."
-                className="w-full pl-12 pr-4 py-3 border-2 border-soft-brown-200 rounded-4xl focus:outline-none focus:ring-4 focus:ring-warm-green-500/20 focus:border-warm-green-500 transition-all glass-organic backdrop-blur-organic"
+                placeholder={t('ingredientSelector.searchPlaceholder', { defaultValue: 'Search for ingredients...' })}
+                className="w-full pl-12 pr-16 py-3 border-2 border-soft-brown-200 rounded-4xl focus:outline-none focus:ring-4 focus:ring-warm-green-500/20 focus:border-warm-green-500 transition-all glass-organic backdrop-blur-organic"
               />
+              
+              {/* Voice Search Button */}
+              {voiceRecognition.isSupported && (
+                <button
+                  onClick={voiceRecognition.isListening ? voiceRecognition.stopListening : voiceRecognition.startListening}
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    voiceRecognition.isListening
+                      ? 'bg-red-500 text-white animate-pulse'
+                      : 'bg-warm-green-500 text-white hover:bg-warm-green-600'
+                  }`}
+                  title={voiceRecognition.isListening ? 
+                    t('voice.stopListening', { defaultValue: 'Stop listening' }) : 
+                    t('voice.startListening', { defaultValue: 'Start voice search' })
+                  }
+                >
+                  <Mic className="w-5 h-5" />
+                </button>
+              )}
             </div>
+            
+            {/* Voice Status */}
+            {(voiceStatus || voiceRecognition.isListening || isSpeaking) && (
+              <div className="mt-3 p-3 bg-gradient-to-r from-warm-green-50 to-muted-blue-50 rounded-3xl border border-warm-green-200">
+                <div className="flex items-center gap-2">
+                  {isSpeaking ? (
+                    <BookOpen className="w-4 h-4 text-blue-500 animate-pulse" />
+                  ) : (
+                    <Mic className={`w-4 h-4 ${voiceRecognition.isListening ? 'text-red-500 animate-pulse' : 'text-warm-green-500'}`} />
+                  )}
+                  <span className="text-sm font-medium text-soft-brown-700">
+                    {isSpeaking ? 
+                      'Reading recipe aloud...' :
+                      voiceRecognition.isListening ? 
+                      t('voice.listening', { defaultValue: 'Listening... Say something like "I have chicken and rice"' }) : 
+                      voiceStatus
+                    }
+                  </span>
+                </div>
+              </div>
+            )}
+            
+            {/* Quick Action Buttons */}
+            {selectedIngredients.length > 0 && (
+              <div className="mt-3 flex gap-2 flex-wrap">
+                {user && (
+                  <button
+                    onClick={() => handleShoppingListCommand({ 
+                      action: 'shopping_list', 
+                      shoppingListAction: 'add_missing' 
+                    })}
+                    disabled={isCreatingShoppingList}
+                    className="flex items-center gap-2 px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-2xl text-sm font-medium transition-colors disabled:opacity-50"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    {isCreatingShoppingList ? 'Adding...' : 'Add Missing to Shopping List'}
+                  </button>
+                )}
+                
+                {allRecipes.length > 0 && (
+                  <button
+                    onClick={() => handleRecipeNarrationCommand({ 
+                      action: 'recipe_narration', 
+                      narrationAction: 'read_recipe' 
+                    })}
+                    disabled={isSpeaking}
+                    className="flex items-center gap-2 px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-2xl text-sm font-medium transition-colors disabled:opacity-50"
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    {isSpeaking ? 'Reading...' : 'Read Top Recipe'}
+                  </button>
+                )}
+              </div>
+            )}
+            
+            {/* Smart Conversation Panel */}
+            {(conversationContext || followUpQuestion) && (
+              <div className="mt-3 p-4 bg-gradient-to-r from-light-lavender-50 to-dusty-pink-50 rounded-3xl border border-light-lavender-200">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-r from-light-lavender-500 to-dusty-pink-500 p-2 rounded-full flex-shrink-0">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-semibold text-soft-brown-800 mb-1">
+                      {conversationContext === 'meal_planning' && 'Meal Planning Assistant'}
+                      {conversationContext === 'dietary_filtering' && 'Dietary Assistant'}
+                      {conversationContext === 'time_based' && 'Quick Cooking Assistant'}
+                      {conversationContext === 'flavor_based' && 'Flavor Assistant'}
+                      {conversationContext === 'ingredient_search' && 'Ingredient Assistant'}
+                    </h4>
+                    {followUpQuestion && (
+                      <p className="text-sm text-soft-brown-600">{followUpQuestion}</p>
+                    )}
+                    
+                    {/* Voice Preferences Display */}
+                    {(voicePreferences.dietary.length > 0 || voicePreferences.cookTime || voicePreferences.difficulty || voicePreferences.mealType) && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {voicePreferences.dietary.map(diet => (
+                          <span key={diet} className="px-2 py-1 bg-light-lavender-100 text-light-lavender-700 rounded-full text-xs font-medium">
+                            {diet}
+                          </span>
+                        ))}
+                        {voicePreferences.cookTime && (
+                          <span className="px-2 py-1 bg-dusty-pink-100 text-dusty-pink-700 rounded-full text-xs font-medium">
+                            Under {voicePreferences.cookTime} min
+                          </span>
+                        )}
+                        {voicePreferences.difficulty && (
+                          <span className="px-2 py-1 bg-warm-green-100 text-warm-green-700 rounded-full text-xs font-medium">
+                            {voicePreferences.difficulty}
+                          </span>
+                        )}
+                        {voicePreferences.mealType && (
+                          <span className="px-2 py-1 bg-muted-blue-100 text-muted-blue-700 rounded-full text-xs font-medium">
+                            {voicePreferences.mealType}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Quick Voice Examples */}
+                    <div className="mt-3 text-xs text-soft-brown-500">
+                      <strong>Try saying:</strong> 
+                      {conversationContext === 'meal_planning' && ' "I have pasta and tomatoes", "Show me vegetarian options", or "Add missing ingredients to shopping list"'}
+                      {conversationContext === 'dietary_filtering' && ' "I also have cheese", "Make it under 20 minutes", or "Read me the ingredients"'}
+                      {conversationContext === 'time_based' && ' "I have chicken breast", "Something spicy", or "Create shopping list from recipe"'}
+                      {conversationContext === 'flavor_based' && ' "I have garlic and herbs", "Make it vegetarian", or "Tell me the nutrition info"'}
+                      {conversationContext === 'ingredient_search' && ' "I also have onions", "Make it quick and easy", "Read the top recipe", or "Add to shopping list"'}
+                      {!conversationContext && ' "Read me the recipe", "Add missing ingredients to shopping list", "I have chicken and rice", or "What can I make for dinner?"'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Category Filters */}

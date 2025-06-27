@@ -58,6 +58,16 @@
     "howMuch": "Combien",
     "whatsNext": "Quoi ensuite"
   },
+  "voice": {
+    "startListening": "Démarrer la recherche vocale",
+    "stopListening": "Arrêter d'écouter",
+    "listening": "Écoute... Dites quelque chose comme \"j'ai du poulet et du riz\"",
+    "ingredientsAdded": "Ajouté {{ingredients}} à vos ingrédients",
+    "ingredientsAlreadySelected": "Ces ingrédients sont déjà sélectionnés"
+  },
+  "ingredientSelector": {
+    "searchPlaceholder": "Rechercher des ingrédients..."
+  },
   "cookingMode": "Mode Cuisine",
   "step": "Étape",
   "of": "de",
@@ -104,7 +114,6 @@
   "dietaryPreferences": "Préférences Alimentaires",
   "noneSpecified": "Aucune spécifiée",
   "yourFavoriteCuisineStats": "Statistiques de Vos Cuisines Favorites",
-  "recipes": "recettes",
   "voiceAssistantSettings": "Paramètres de l'Assistant Vocal",
   "voiceAssistantDescription": "Votre assistant vocal répondra en {{language}} avec considération pour {{restrictions}}",
   "saving": "Sauvegarde...",

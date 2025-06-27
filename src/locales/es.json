@@ -57,6 +57,16 @@
     "howMuch": "Cuánto",
     "whatsNext": "Qué sigue"
   },
+  "voice": {
+    "startListening": "Iniciar búsqueda por voz",
+    "stopListening": "Dejar de escuchar",
+    "listening": "Escuchando... Di algo como \"tengo pollo y arroz\"",
+    "ingredientsAdded": "Se agregó {{ingredients}} a tus ingredientes",
+    "ingredientsAlreadySelected": "Esos ingredientes ya están seleccionados"
+  },
+  "ingredientSelector": {
+    "searchPlaceholder": "Buscar ingredientes..."
+  },
   "cookingMode": "Modo de Cocina",
   "step": "Paso",
   "of": "de",

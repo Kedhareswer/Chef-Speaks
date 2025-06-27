@@ -57,6 +57,16 @@
     "howMuch": "ఎంత",
     "whatsNext": "తరువాత ఏమిటి"
   },
+  "voice": {
+    "startListening": "వాయిస్ సెర్చ్ ప్రారంభించండి",
+    "stopListening": "వినడం ఆపండి",
+    "listening": "వింటున్నాను... \"నా దగ్గర చికెన్ మరియు బియ్యం ఉంది\" అని చెప్పండి",
+    "ingredientsAdded": "{{ingredients}} మీ పదార్థాలకు జోడించారు",
+    "ingredientsAlreadySelected": "ఆ పదార్థాలు ఇప్పటికే ఎంచుకోబడ్డాయి"
+  },
+  "ingredientSelector": {
+    "searchPlaceholder": "పదార్థాలను వెతకండి..."
+  },
   "cookingMode": "వంట మోడ్",
   "step": "దశ",
   "of": "యొక్క",

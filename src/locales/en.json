@@ -82,6 +82,48 @@
     "howMuch": "How much",
     "whatsNext": "What's next"
   },
+  "voice": {
+    "startListening": "Start voice search",
+    "stopListening": "Stop listening",
+    "listening": "Listening... Say something like \"I have chicken and rice\"",
+    "ingredientsAdded": "Added {{ingredients}} to your ingredients",
+    "ingredientsAlreadySelected": "Those ingredients are already selected",
+    "mealPlanningAssistant": "Meal Planning Assistant",
+    "dietaryAssistant": "Dietary Assistant",
+    "quickCookingAssistant": "Quick Cooking Assistant",
+    "flavorAssistant": "Flavor Assistant",
+    "ingredientAssistant": "Ingredient Assistant",
+    "advancedCommands": {
+      "whatCanIMake": "What can I make for dinner?",
+      "quickVegetarian": "Show me quick vegetarian meals",
+      "allergicToNuts": "I'm allergic to nuts",
+      "spicyWithChicken": "I want something spicy with chicken",
+      "under20Minutes": "Make it under 20 minutes",
+      "healthyOptions": "Show me healthy options",
+      "addToShoppingList": "Add missing ingredients to shopping list",
+      "readRecipe": "Read me the recipe",
+      "readIngredients": "Read the ingredients",
+      "readInstructions": "Read cooking instructions",
+      "readNutrition": "Tell me the nutrition info",
+      "createShoppingList": "Create shopping list from recipe"
+    },
+    "shoppingList": {
+      "adding": "Adding to shopping list...",
+      "added": "Added to your shopping list",
+      "error": "Error adding to shopping list",
+      "signInRequired": "Please sign in to use shopping list features"
+    },
+    "narration": {
+      "reading": "Reading recipe...",
+      "readingIngredients": "Reading ingredients...",
+      "readingInstructions": "Reading instructions...",
+      "readingNutrition": "Reading nutrition info...",
+      "noRecipe": "No recipe selected"
+    }
+  },
+  "ingredientSelector": {
+    "searchPlaceholder": "Search for ingredients..."
+  },
   "cookingMode": "Cooking Mode",
   "step": "Step",
   "of": "of",

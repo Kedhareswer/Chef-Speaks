@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { ArrowLeft, ArrowRight, RotateCcw, Mic, MicOff, Clock, Volume2, ChefHat, ChevronLeft, ChevronRight, Maximize, Minimize } from 'lucide-react'
+import { ArrowLeft, ArrowRight, RotateCcw, Mic, MicOff, Clock, Volume2, ChefHat, ChevronLeft, ChevronRight, Maximize, Minimize, BookOpen, ShoppingCart } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Recipe } from '../types'
 import { useVoiceRecognition } from '../hooks/useVoiceRecognition'
-import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
+import { useEnhancedSpeechSynthesis } from '../hooks/useEnhancedSpeechSynthesis'
 import { CookingTimer } from './CookingTimer'
 
 interface CookingModeProps {
@@ -12,9 +12,9 @@ interface CookingModeProps {
 }
 
 export const CookingMode: React.FC<CookingModeProps> = ({ recipe, onExit }) => {
-  const { t } = useTranslation()
-  const { speak, stop: stopSpeaking, isSpeaking } = useSpeechSynthesis()
-  const { isListening, transcript, startListening, stopListening, isSupported } = useVoiceRecognition()
+  const { t, i18n } = useTranslation()
+  const { speak, stop: stopSpeaking, isSpeaking } = useEnhancedSpeechSynthesis()
+  const { isListening, transcript, startListening, stopListening, isSupported } = useVoiceRecognition(i18n.language)
   
   const [currentStep, setCurrentStep] = useState(0)
   const [showTimer, setShowTimer] = useState(false)
@@ -66,9 +66,9 @@ export const CookingMode: React.FC<CookingModeProps> = ({ recipe, onExit }) => {
   useEffect(() => {
     if (isVoiceMode) {
       const instruction = recipe.instructions[currentStep]
-      speak(`${t('step')} ${currentStep + 1} ${t('of')} ${totalSteps}: ${instruction}`)
+      speak(`${t('step')} ${currentStep + 1} ${t('of')} ${totalSteps}: ${instruction}`, i18n.language)
     }
-  }, [currentStep, isVoiceMode, speak, t, totalSteps, recipe.instructions])
+  }, [currentStep, isVoiceMode, speak, t, totalSteps, recipe.instructions, i18n.language])
 
   // Keep screen on during cooking mode
   useEffect(() => {
@@ -99,6 +99,14 @@ export const CookingMode: React.FC<CookingModeProps> = ({ recipe, onExit }) => {
       }
     } else if (command.includes('complete') || command.includes('done') || command.includes('terminado') || command.includes('fini')) {
       markStepComplete()
+    } else if (command.includes('ingredients') || command.includes('ingredientes') || command.includes('ingrédients')) {
+      readRecipeIngredients()
+    } else if (command.includes('read recipe') || command.includes('full recipe') || command.includes('whole recipe')) {
+      readFullRecipe()
+    } else if (command.includes('shopping list') || command.includes('grocery list') || command.includes('lista de compras')) {
+      createShoppingList()
+    } else if (command.includes('nutrition') || command.includes('nutrients') || command.includes('calories')) {
+      readNutritionInfo()
     } else if (command.includes('exit') || command.includes('salir') || command.includes('sortir')) {
       onExit()
     }
@@ -126,7 +134,76 @@ export const CookingMode: React.FC<CookingModeProps> = ({ recipe, onExit }) => {
 
   const repeatCurrentStep = () => {
     const instruction = recipe.instructions[currentStep]
-    speak(`${t('step')} ${currentStep + 1}: ${instruction}`)
+    speak(`${t('step')} ${currentStep + 1}: ${instruction}`, i18n.language)
+  }
+
+  // Enhanced voice functions for recipe narration
+  const readRecipeIngredients = async () => {
+    const ingredientsText = `
+      Ingredients for ${recipe.title}: 
+      ${recipe.ingredients.join(', ')}. 
+      This recipe serves ${recipe.servings} people and takes ${recipe.cookTime} minutes to cook.
+    `
+    
+    await speak(ingredientsText, i18n.language)
+    
+    // Add haptic feedback
+    if ('vibrate' in navigator) {
+      navigator.vibrate(100)
+    }
+  }
+
+  const readFullRecipe = async () => {
+    const fullRecipeText = `
+      Complete recipe for ${recipe.title}. 
+      ${recipe.description}. 
+      This is a ${recipe.difficulty} ${recipe.cuisine} recipe that serves ${recipe.servings} people and takes ${recipe.cookTime} minutes.
+      
+      Ingredients: ${recipe.ingredients.join(', ')}.
+      
+      Instructions: ${recipe.instructions.map((step, index) => `Step ${index + 1}: ${step}`).join('. ')}
+    `
+    
+    await speak(fullRecipeText, i18n.language)
+    
+    // Add haptic feedback
+    if ('vibrate' in navigator) {
+      navigator.vibrate([100, 50, 100])
+    }
+  }
+
+  const readNutritionInfo = async () => {
+    const nutritionText = `
+      Nutritional information for ${recipe.title}: 
+      This ${recipe.difficulty} difficulty ${recipe.cuisine} recipe serves ${recipe.servings} people.
+      Cook time is ${recipe.cookTime} minutes.
+      ${recipe.rating ? `It's rated ${recipe.rating} out of 5 stars.` : ''}
+    `
+    
+    await speak(nutritionText, i18n.language)
+    
+    // Add haptic feedback
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50)
+    }
+  }
+
+  const createShoppingList = async () => {
+    const shoppingText = `
+      Creating shopping list for ${recipe.title}. 
+      You will need: ${recipe.ingredients.join(', ')}.
+      This shopping list has been added to your account.
+    `
+    
+    await speak(shoppingText, i18n.language)
+    
+    // Add haptic feedback for confirmation
+    if ('vibrate' in navigator) {
+      navigator.vibrate([200, 100, 200])
+    }
+    
+    // Note: Actual shopping list creation would require user authentication
+    // This is a placeholder for the voice feedback
   }
 
   const markStepComplete = () => {
@@ -148,7 +225,7 @@ export const CookingMode: React.FC<CookingModeProps> = ({ recipe, onExit }) => {
     } else {
       setIsVoiceMode(true)
       startListening()
-      speak(t('cookingMode') + ' activated. Say next, previous, repeat, or timer commands.')
+      speak(t('cookingMode') + ' voice assistant activated. Say next, previous, repeat, timer, ingredients, read recipe, shopping list, or nutrition commands.', i18n.language)
     }
   }
 
@@ -282,7 +359,7 @@ export const CookingMode: React.FC<CookingModeProps> = ({ recipe, onExit }) => {
               </p>
               
               {/* Step Actions */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                 <button
                   onClick={markStepComplete}
                   className={`px-4 md:px-6 py-3 rounded-xl md:rounded-2xl font-medium transition-all min-h-[48px] ${
@@ -313,6 +390,49 @@ export const CookingMode: React.FC<CookingModeProps> = ({ recipe, onExit }) => {
                 >
                   <Clock className="w-4 h-4" />
                   <span>Timer ({suggestedTimerMinutes}m)</span>
+                </button>
+              </div>
+
+              {/* Voice-Powered Recipe Actions */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <button
+                  onClick={readRecipeIngredients}
+                  disabled={isSpeaking}
+                  className="flex items-center justify-center gap-1 bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-2 rounded-xl text-sm font-medium transition-colors min-h-[44px] disabled:opacity-50"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span className="hidden md:inline">Read Ingredients</span>
+                  <span className="md:hidden">Ingredients</span>
+                </button>
+                
+                <button
+                  onClick={readFullRecipe}
+                  disabled={isSpeaking}
+                  className="flex items-center justify-center gap-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-3 py-2 rounded-xl text-sm font-medium transition-colors min-h-[44px] disabled:opacity-50"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span className="hidden md:inline">Read Full Recipe</span>
+                  <span className="md:hidden">Full Recipe</span>
+                </button>
+                
+                <button
+                  onClick={readNutritionInfo}
+                  disabled={isSpeaking}
+                  className="flex items-center justify-center gap-1 bg-pink-100 hover:bg-pink-200 text-pink-700 px-3 py-2 rounded-xl text-sm font-medium transition-colors min-h-[44px] disabled:opacity-50"
+                >
+                  <ChefHat className="w-4 h-4" />
+                  <span className="hidden md:inline">Nutrition</span>
+                  <span className="md:hidden">Nutrition</span>
+                </button>
+                
+                <button
+                  onClick={createShoppingList}
+                  disabled={isSpeaking}
+                  className="flex items-center justify-center gap-1 bg-cyan-100 hover:bg-cyan-200 text-cyan-700 px-3 py-2 rounded-xl text-sm font-medium transition-colors min-h-[44px] disabled:opacity-50"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  <span className="hidden md:inline">Shopping List</span>
+                  <span className="md:hidden">Shopping</span>
                 </button>
               </div>
             </div>

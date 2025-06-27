@@ -32,7 +32,6 @@
   "startCooking": "खाना बनाना शुरू करें",
   "shareRecipe": "व्यंजन साझा करें",
   "viewRecipe": "व्यंजन देखें",
-  "recipes": "व्यंजन",
   "searchResults": {
     "foundOne": "{{query}} के लिए 1 रेसिपी मिली",
     "foundMany": "{{query}} के लिए {{count}} रेसिपी मिलीं",
@@ -57,6 +56,16 @@
     "stopTimer": "टाइमर बंद करें",
     "howMuch": "कितना",
     "whatsNext": "आगे क्या"
+  },
+  "voice": {
+    "startListening": "आवाज़ खोज शुरू करें",
+    "stopListening": "सुनना बंद करें",
+    "listening": "सुन रहा हूँ... कुछ कहें जैसे \"मेरे पास चिकन और चावल है\"",
+    "ingredientsAdded": "{{ingredients}} आपकी सामग्री में जोड़ दिया गया",
+    "ingredientsAlreadySelected": "वे सामग्री पहले से चुनी गई हैं"
+  },
+  "ingredientSelector": {
+    "searchPlaceholder": "सामग्री खोजें..."
   },
   "cookingMode": "कुकिंग मोड",
   "step": "कदम",
