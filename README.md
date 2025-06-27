@@ -103,6 +103,7 @@ graph TB
 | **Recipes** | Spoonacular API | Recipe data and nutrition |
 | **Build Tool** | Vite 5.4.2 | Fast development and builds |
 | **Deployment** | Netlify | Static site hosting |
+| **Localization** | Lingo.dev CLI | AI-powered translations |
 
 ---
 
@@ -113,6 +114,7 @@ graph TB
 - Supabase account
 - Eleven Labs API key (optional)
 - Spoonacular API key (optional)
+- Groq API key (for translations)
 
 ### Installation
 
@@ -138,6 +140,7 @@ graph TB
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    VITE_ELEVEN_LABS_API_KEY=your_eleven_labs_key
    VITE_SPOONACULAR_API_KEY=your_spoonacular_key
+   GROQ_API_KEY=your_groq_api_key
    ```
 
 4. **Database setup**
@@ -158,76 +161,6 @@ graph TB
 
 ---
 
-## ⚙️ Configuration
-
-### Supabase Setup
-
-1. **Create a new Supabase project**
-2. **Run the provided migrations**:
-   - `20250624115247_rough_night.sql` - Initial schema
-   - `20250624122808_stark_coral.sql` - Enhanced features
-   - `20250624124625_silent_oasis.sql` - RLS policies
-   - `20250624130434_jolly_pine.sql` - Anonymous access
-   - `20250624131519_lucky_haze.sql` - User deletion
-
-3. **Configure Edge Functions**:
-   ```bash
-   # Deploy edge functions
-   supabase functions deploy elevenlabs-tts
-   supabase functions deploy recipe-search
-   supabase functions deploy recipe-nutrition
-   ```
-
-4. **Set environment variables** in Supabase dashboard:
-   - `ELEVEN_LABS_API_KEY`
-   - `VITE_SPOONACULAR_API_KEY`
-
-### API Keys Setup
-
-| Service | Required | Purpose | How to Get |
-|---------|----------|---------|------------|
-| **Supabase** | ✅ Yes | Database & Auth | [supabase.com](https://supabase.com) |
-| **Eleven Labs** | 🔶 Optional | Enhanced TTS | [elevenlabs.io](https://elevenlabs.io) |
-| **Spoonacular** | 🔶 Optional | Recipe Data | [spoonacular.com](https://spoonacular.com/food-api) |
-
----
-
-## 🗣️ Voice Features
-
-### Voice Recognition
-- **Languages Supported**: English, Spanish, French, Hindi, Telugu
-- **Commands**: Recipe search, navigation, cooking instructions
-- **Accuracy**: 95%+ in optimal conditions
-
-### Text-to-Speech
-| Provider | Quality | Languages | Latency |
-|----------|---------|-----------|---------|
-| **Eleven Labs** | Premium | 5 | ~2s |
-| **Web Speech** | Standard | 50+ | ~0.5s |
-
-### Voice Commands Examples
-```
-"Find me a pasta recipe"
-"Show me Italian dishes"
-"Next step"
-"Set timer for 10 minutes"
-"What ingredients do I need?"
-```
-
-### Available Voices
-
-| Language | Voice Name | Gender | Provider |
-|----------|------------|--------|----------|
-| English | Bella | Female | Eleven Labs |
-| English | Adam | Male | Eleven Labs |
-| Spanish | Valentina | Female | Eleven Labs |
-| Spanish | Diego | Male | Eleven Labs |
-| French | Charlotte | Female | Eleven Labs |
-| Hindi | Ananya | Female | Eleven Labs |
-| Telugu | Priya | Female | Eleven Labs |
-
----
-
 ## 🌍 Multi-Language Support
 
 ### Supported Languages
@@ -239,228 +172,18 @@ graph TB
 | Hindi | `hi` | ✅ | ✅ | 🔶 |
 | Telugu | `te` | ✅ | ✅ | 🔶 |
 
+### Translation Management
+ChefSpeak uses Lingo.dev CLI for AI-powered translations:
+
+1. **Extract Translations**: All UI strings are stored in JSON files in `src/locales/`
+2. **Update Translations**: Run `npx lingo.dev@latest i18n` to update all language files
+3. **Add Languages**: Add new target languages in `i18n.json`
+
 ### Translation Coverage
 - **UI Elements**: 100% translated
 - **Voice Commands**: Localized for each language
 - **Recipe Content**: English base with localized search
 - **Error Messages**: Fully localized
-
----
-
-## 📱 User Interface
-
-### Design System
-- **Color Palette**: Organic, food-inspired colors
-- **Typography**: Inter font family
-- **Components**: Reusable, accessible components
-- **Responsive**: Mobile-first design approach
-
-### Key Components
-| Component | Purpose | Features |
-|-----------|---------|----------|
-| `VoiceButton` | Voice interaction | Multi-state, animated |
-| `RecipeCard` | Recipe display | Hover effects, ratings |
-| `SearchBar` | Recipe search | Voice input, filters |
-| `CookingMode` | Guided cooking | Step-by-step, timers |
-| `UserProfile` | User settings | Preferences, voice config |
-
-### Responsive Breakpoints
-```css
-sm: 640px   /* Mobile landscape */
-md: 768px   /* Tablet */
-lg: 1024px  /* Desktop */
-xl: 1280px  /* Large desktop */
-```
-
----
-
-## 🔧 API Integration
-
-### Internal APIs (Supabase Edge Functions)
-
-| Function | Purpose | Input | Output |
-|----------|---------|-------|--------|
-| `elevenlabs-tts` | Text-to-speech | Text, voice settings | Audio blob |
-| `recipe-search` | Recipe search | Search params | Recipe array |
-| `recipe-nutrition` | Nutrition data | Recipe/ingredients | Nutrition info |
-
-### External APIs
-
-#### Spoonacular API
-- **Endpoint**: `https://api.spoonacular.com`
-- **Rate Limit**: 150 requests/day (free tier)
-- **Features**: Recipe search, nutrition analysis, ingredient parsing
-
-#### Eleven Labs API
-- **Endpoint**: `https://api.elevenlabs.io`
-- **Rate Limit**: 10,000 characters/month (free tier)
-- **Features**: High-quality TTS, voice cloning
-
----
-
-## 🗄️ Database Schema
-
-### Core Tables
-
-```mermaid
-erDiagram
-    profiles ||--o{ recipes : creates
-    profiles ||--o{ comments : writes
-    profiles ||--o{ user_favorites : has
-    profiles ||--o{ meal_plans : plans
-    profiles ||--o{ shopping_lists : manages
-    
-    recipes ||--o{ comments : receives
-    recipes ||--o{ user_favorites : favorited
-    recipes ||--o{ meal_plans : planned
-    recipes ||--o{ recipe_nutrition : has
-    
-    profiles {
-        uuid id PK
-        text email
-        text full_name
-        text avatar_url
-        text[] dietary_restrictions
-        text[] favorite_cuisines
-        enum cooking_skill_level
-        text preferred_language
-        timestamptz created_at
-        timestamptz updated_at
-    }
-    
-    recipes {
-        uuid id PK
-        text title
-        text description
-        jsonb ingredients
-        jsonb instructions
-        integer cook_time
-        integer servings
-        enum difficulty
-        text cuisine
-        text image_url
-        text video_url
-        text[] tags
-        uuid author_id FK
-        boolean is_user_generated
-        numeric rating
-        integer total_ratings
-        timestamptz created_at
-    }
-```
-
-### Table Statistics
-| Table | Estimated Rows | Growth Rate | Storage |
-|-------|----------------|-------------|---------|
-| `recipes` | 25,000+ | +100/month | 50MB |
-| `profiles` | 1,000+ | +50/month | 2MB |
-| `comments` | 5,000+ | +200/month | 5MB |
-| `meal_plans` | 10,000+ | +500/month | 3MB |
-
----
-
-## 🔐 Security
-
-### Authentication
-- **Provider**: Supabase Auth
-- **Methods**: Email/password
-- **Session**: JWT tokens with refresh
-- **Security**: Row Level Security (RLS)
-
-### Data Protection
-| Feature | Implementation | Status |
-|---------|----------------|--------|
-| **RLS Policies** | Table-level access control | ✅ |
-| **Input Validation** | Client & server-side | ✅ |
-| **API Rate Limiting** | Edge function limits | ✅ |
-| **HTTPS Only** | SSL/TLS encryption | ✅ |
-| **CORS Protection** | Configured headers | ✅ |
-
-### Privacy
-- **Data Minimization**: Only collect necessary data
-- **User Control**: Full account deletion available
-- **Encryption**: All data encrypted at rest
-- **Compliance**: GDPR considerations implemented
-
----
-
-## 📊 Performance
-
-### Metrics
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| **First Contentful Paint** | <1.5s | 1.2s | ✅ |
-| **Largest Contentful Paint** | <2.5s | 2.1s | ✅ |
-| **Time to Interactive** | <3.5s | 2.8s | ✅ |
-| **Cumulative Layout Shift** | <0.1 | 0.05 | ✅ |
-
-### Optimization Strategies
-- **Code Splitting**: Route-based lazy loading
-- **Image Optimization**: WebP format, lazy loading
-- **Caching**: Service worker for offline support
-- **Bundle Size**: Tree shaking, minimal dependencies
-
-### Database Performance
-- **Indexes**: Optimized for common queries
-- **Connection Pooling**: Supabase managed
-- **Query Optimization**: Efficient joins and filters
-
----
-
-## 🧪 Testing
-
-### Test Coverage
-```
-Components: 85%
-Hooks: 90%
-Services: 80%
-Utils: 95%
-Overall: 87%
-```
-
-### Testing Strategy
-| Type | Framework | Coverage |
-|------|-----------|----------|
-| **Unit Tests** | Vitest | Components, hooks |
-| **Integration** | Testing Library | User flows |
-| **E2E Tests** | Playwright | Critical paths |
-| **Performance** | Lighthouse CI | Core metrics |
-
-### Running Tests
-```bash
-# Unit tests
-npm run test
-
-# E2E tests
-npm run test:e2e
-
-# Coverage report
-npm run test:coverage
-```
-
----
-
-## 🚀 Deployment
-
-### Build Process
-```bash
-# Production build
-npm run build
-
-# Preview build
-npm run preview
-
-# Lint check
-npm run lint
-```
-
-### Deployment Platforms
-
-| Platform | Status | URL | Features |
-|----------|--------|-----|----------|
-| **Netlify** | ✅ Active | [chefspeak.netlify.app](https://chefspeaks.netlify.app) | Auto-deploy, CDN |
-| **Vercel** | 🔶 Ready | - | Edge functions |
-| **Supabase** | 🔶 Ready | - | Full-stack |
 
 ---
 
@@ -490,14 +213,9 @@ src/
 ├── utils/              # Utility functions
 ├── types/              # TypeScript type definitions
 ├── data/               # Static data and constants
+├── locales/            # Translation files
 └── lib/                # Third-party library configs
 ```
-
-### Contribution Guidelines
-- **Issues**: Use provided templates
-- **PRs**: Include tests and documentation
-- **Code Review**: Required for all changes
-- **Documentation**: Update README for new features
 
 ---
 
@@ -510,16 +228,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Supabase**: Apache 2.0 License
 - **Tailwind CSS**: MIT License
 - **Lucide React**: ISC License
-
----
-
-## 📞 Support & Contact
-
-### Getting Help
-- **Documentation**: Check this README first
-- **Issues**: [GitHub Issues](https://github.com/your-username/chefspeak/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/chefspeak/discussions)
-- **Email**: support@chefspeak.com
 
 ---
 

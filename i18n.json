@@ -1,0 +1,16 @@
+{
+  "locale": {
+    "source": "en",
+    "targets": ["es", "fr", "hi", "te"]
+  },
+  "buckets": {
+    "json": {
+      "include": ["src/locales/[locale].json"]
+    }
+  },
+  "provider": {
+    "id": "groq",
+    "model": "llama3-70b-8192",
+    "prompt": "Act as a professional software localization expert. Translate each key from {source} to {target}. Preserve ICU message format placeholders like {name} and {{count}}. Maintain Markdown formatting including links and code blocks. Match the tone and formality of the source text. Technical terms that are typically untranslated in the industry should remain in English."
+  }
+}
