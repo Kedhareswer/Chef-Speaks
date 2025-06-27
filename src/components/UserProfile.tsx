@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { User, Settings, Heart, Calendar, ShoppingCart, X, Save, Globe, Mic, Star, ChefHat, Trash2, AlertTriangle, Volume2 } from 'lucide-react'
+import { Settings, Heart, Calendar, ShoppingCart, X, Save, Globe, Mic, Star, ChefHat, Trash2, AlertTriangle, Volume2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { userService, UserProfile as UserProfileType } from '../services/userService'
