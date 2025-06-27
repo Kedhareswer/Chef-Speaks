@@ -1,19 +1,62 @@
 {
   "name": "ChefSpeak - Voice-Powered Cooking Companion",
   "short_name": "ChefSpeak",
-  "description": "Your voice-powered cooking companion with location-based recipes and video tutorials",
+  "description": "Your AI-powered cooking companion with voice commands, location-based recipes, and hands-free cooking mode",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#F97316",
+  "background_color": "#faf8f5",
+  "theme_color": "#5cb85c",
   "orientation": "portrait-primary",
   "scope": "/",
+  "prefer_related_applications": false,
   "icons": [
+    {
+      "src": "chef-hat.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "icons/icon-512x512.png",
@@ -22,6 +65,101 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["food", "lifestyle", "utilities"],
-  "lang": "en-US"
+  "shortcuts": [
+    {
+      "name": "Voice Search",
+      "short_name": "Voice",
+      "description": "Start voice recipe search",
+      "url": "/?voice=true",
+      "icons": [
+        {
+          "src": "icons/voice-shortcut.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Quick Recipes",
+      "short_name": "Quick",
+      "description": "Find quick 30-minute recipes",
+      "url": "/?filter=quick",
+      "icons": [
+        {
+          "src": "icons/quick-shortcut.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Trending",
+      "short_name": "Trending",
+      "description": "See what's trending in cooking",
+      "url": "/?view=trending",
+      "icons": [
+        {
+          "src": "icons/trending-shortcut.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Community",
+      "short_name": "Community",
+      "description": "Browse community recipes",
+      "url": "/?view=community",
+      "icons": [
+        {
+          "src": "icons/community-shortcut.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "categories": ["food", "lifestyle", "utilities", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "handle_links": "preferred",
+  "capture_links": "new-client",
+  "protocol_handlers": [
+    {
+      "protocol": "web+chefspeak",
+      "url": "/?recipe=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "application/json": [".json"],
+        "text/plain": [".txt", ".recipe"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": ["image/*", ".json"]
+        }
+      ]
+    }
+  }
 }

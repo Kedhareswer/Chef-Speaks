@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Users, ChefHat, Star, Play, Flame, Globe, Heart } from 'lucide-react';
+import { Clock, Users, ChefHat, Star, Play, Flame, Globe, Heart, Share2 } from 'lucide-react';
 import { Recipe } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { userService } from '../services/userService';
@@ -35,6 +35,11 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
     e.stopPropagation();
     if (!user || isUpdatingFavorite) return;
 
+    // Add haptic feedback
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+
     setIsUpdatingFavorite(true);
     try {
       if (isFavorite) {
@@ -48,6 +53,37 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
       console.error('Error updating favorite:', error);
     } finally {
       setIsUpdatingFavorite(false);
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Add haptic feedback
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: recipe.title,
+          text: `Check out this recipe: ${recipe.description}`,
+          url: window.location.href
+        });
+      } catch (error) {
+        console.log('Share canceled');
+      }
+    } else {
+      // Fallback for browsers without native sharing
+      if (navigator.clipboard) {
+        try {
+          await navigator.clipboard.writeText(`${recipe.title}: ${window.location.href}`);
+          // Could show a toast notification here
+        } catch (error) {
+          console.error('Failed to copy to clipboard:', error);
+        }
+      }
     }
   };
 
@@ -67,20 +103,21 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
   };
 
   return (
-    <div className="group glass-organic backdrop-blur-organic rounded-5xl shadow-soft-xl overflow-hidden hover:shadow-soft-2xl transition-all duration-500 transform hover:-translate-y-2 border border-terracotta-200/30 card-organic-hover">
+    <div className="group glass-organic backdrop-blur-organic rounded-3xl md:rounded-5xl shadow-soft-xl overflow-hidden hover:shadow-soft-2xl transition-all duration-500 transform hover:-translate-y-2 border border-terracotta-200/30 card-organic-hover">
       {/* Recipe Image */}
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative h-48 md:h-56 overflow-hidden">
         <img
           src={recipe.imageUrl}
           alt={recipe.title}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
 
         {/* Top badges */}
-        <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+        <div className="absolute top-3 md:top-4 left-3 md:left-4 right-3 md:right-4 flex justify-between items-start">
           <div className="flex flex-col gap-2">
-            <span className={`px-3 py-1 rounded-pill text-sm font-semibold border backdrop-blur-sm ${getDifficultyColor(recipe.difficulty)}`}>
+            <span className={`px-2.5 md:px-3 py-1 rounded-pill text-xs md:text-sm font-semibold border backdrop-blur-sm ${getDifficultyColor(recipe.difficulty)}`}>
               {recipe.difficulty}
             </span>
             {recipe.rating && recipe.rating >= 4.5 && (
@@ -92,40 +129,55 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
           </div>
           
           <div className="flex flex-col gap-2 items-end">
-            {/* Favorite Button */}
-            {user && (
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              {/* Share Button */}
               <button
-                onClick={handleToggleFavorite}
-                disabled={isUpdatingFavorite}
-                className={`p-2 rounded-full backdrop-blur-sm transition-all transform hover:scale-110 ${
-                  isFavorite 
-                    ? 'bg-terracotta-500 text-white' 
-                    : 'bg-white/20 text-white hover:bg-white/30'
-                } ${isUpdatingFavorite ? 'opacity-50 cursor-not-allowed' : ''}`}
-                title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                onClick={handleShare}
+                className="p-2 md:p-2.5 rounded-full backdrop-blur-sm bg-white/20 text-white hover:bg-white/30 transition-all transform hover:scale-110 active:scale-95 min-h-[40px] min-w-[40px]"
+                title="Share recipe"
               >
-                <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+                <Share2 className="w-4 h-4" />
               </button>
-            )}
+
+              {/* Favorite Button */}
+              {user && (
+                <button
+                  onClick={handleToggleFavorite}
+                  disabled={isUpdatingFavorite}
+                  className={`p-2 md:p-2.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110 active:scale-95 min-h-[40px] min-w-[40px] ${
+                    isFavorite 
+                      ? 'bg-terracotta-500 text-white' 
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  } ${isUpdatingFavorite ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                >
+                  <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+                </button>
+              )}
+            </div>
             
-            {recipe.videoUrl && (
-              <div className="bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 text-white px-3 py-1 rounded-pill text-xs font-semibold flex items-center gap-1 backdrop-blur-sm">
-                <Play className="w-3 h-3 fill-current" />
-                Video
-              </div>
-            )}
-            {recipe.cookTime <= 30 && (
-              <div className="bg-gradient-to-r from-warm-green-500 to-muted-blue-500 text-white px-2 py-1 rounded-pill text-xs font-bold flex items-center gap-1 backdrop-blur-sm">
-                <Flame className="w-3 h-3" />
-                Quick
-              </div>
-            )}
+            {/* Recipe Type Badges */}
+            <div className="flex flex-col gap-1 items-end">
+              {recipe.videoUrl && (
+                <div className="bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 text-white px-2.5 py-1 rounded-pill text-xs font-semibold flex items-center gap-1 backdrop-blur-sm">
+                  <Play className="w-3 h-3 fill-current" />
+                  Video
+                </div>
+              )}
+              {recipe.cookTime <= 30 && (
+                <div className="bg-gradient-to-r from-warm-green-500 to-muted-blue-500 text-white px-2 py-1 rounded-pill text-xs font-bold flex items-center gap-1 backdrop-blur-sm">
+                  <Flame className="w-3 h-3" />
+                  Quick
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Cuisine badge */}
-        <div className="absolute bottom-4 left-4">
-          <span className="bg-creamy-yellow-50/90 backdrop-blur-sm text-soft-brown-800 px-3 py-1 rounded-pill text-sm font-semibold border border-creamy-yellow-200/50 flex items-center gap-1">
+        <div className="absolute bottom-3 md:bottom-4 left-3 md:left-4">
+          <span className="bg-creamy-yellow-50/90 backdrop-blur-sm text-soft-brown-800 px-2.5 md:px-3 py-1 rounded-pill text-xs md:text-sm font-semibold border border-creamy-yellow-200/50 flex items-center gap-1">
             <Globe className="w-3 h-3" />
             {recipe.cuisine}
           </span>
@@ -133,9 +185,9 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
       </div>
 
       {/* Recipe Content */}
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <div className="mb-4">
-          <h3 className="text-xl font-bold text-soft-brown-900 leading-tight mb-2 group-hover:text-warm-green-600 transition-colors">
+          <h3 className="text-lg md:text-xl font-bold text-soft-brown-900 leading-tight mb-2 group-hover:text-warm-green-600 transition-colors">
             {recipe.title}
           </h3>
           <p className="text-soft-brown-600 text-sm leading-relaxed line-clamp-2">{recipe.description}</p>
@@ -160,16 +212,16 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
         )}
 
         {/* Recipe Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className={`text-center p-3 rounded-3xl border ${getCookTimeColor(recipe.cookTime)}`}>
+        <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
+          <div className={`text-center p-2.5 md:p-3 rounded-2xl md:rounded-3xl border ${getCookTimeColor(recipe.cookTime)}`}>
             <Clock className="w-4 h-4 mx-auto mb-1" />
             <div className="text-xs font-semibold">{recipe.cookTime}m</div>
           </div>
-          <div className="text-center p-3 rounded-3xl bg-muted-blue-50 text-muted-blue-600 border border-muted-blue-200">
+          <div className="text-center p-2.5 md:p-3 rounded-2xl md:rounded-3xl bg-muted-blue-50 text-muted-blue-600 border border-muted-blue-200">
             <Users className="w-4 h-4 mx-auto mb-1" />
             <div className="text-xs font-semibold">{recipe.servings}</div>
           </div>
-          <div className="text-center p-3 rounded-3xl bg-light-lavender-50 text-light-lavender-600 border border-light-lavender-200">
+          <div className="text-center p-2.5 md:p-3 rounded-2xl md:rounded-3xl bg-light-lavender-50 text-light-lavender-600 border border-light-lavender-200">
             <ChefHat className="w-4 h-4 mx-auto mb-1" />
             <div className="text-xs font-semibold">{recipe.ingredients.length}</div>
           </div>
@@ -195,7 +247,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
         {/* Action Button */}
         <button
           onClick={() => onSelect(recipe)}
-          className="w-full bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 hover:from-warm-green-600 hover:via-terracotta-600 hover:to-soft-brown-600 text-white font-semibold py-4 px-6 rounded-4xl transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-warm-green-500/30 shadow-soft-lg hover:shadow-soft-xl"
+          className="w-full bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 hover:from-warm-green-600 hover:via-terracotta-600 hover:to-soft-brown-600 text-white font-semibold py-4 px-6 rounded-3xl md:rounded-4xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-warm-green-500/30 shadow-soft-lg hover:shadow-soft-xl min-h-[52px]"
         >
           {recipe.videoUrl ? 'View Recipe & Watch Video' : 'View Recipe'}
         </button>

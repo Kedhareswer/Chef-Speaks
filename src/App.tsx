@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ChefHat, MapPin, Sparkles, Users, TrendingUp, Clock, Star, Flame, Globe, Menu, X, Search, User, LogIn, Calendar, ShoppingCart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChefHat, MapPin, Sparkles, Users, TrendingUp, Clock, Star, Flame, Globe, Menu, X, User, LogIn, Calendar, ShoppingCart } from 'lucide-react';
 import { Recipe } from './types';
 import { useVoiceRecognition } from './hooks/useVoiceRecognition';
 import { useLocation } from './hooks/useLocation';
@@ -15,6 +15,7 @@ import { AuthModal } from './components/AuthModal';
 import { UserProfile } from './components/UserProfile';
 import { MealPlanCalendar } from './components/MealPlanCalendar';
 import { ShoppingListView } from './components/ShoppingListView';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { parseVoiceCommand, filterRecipesByVoiceCommand } from './utils/voiceCommands';
 import { recipeService } from './services/recipeService';
 import { checkAndSeedDatabase } from './data/seedData';
@@ -27,7 +28,7 @@ function App() {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('discover');
-  const [showLocalSuggestions, setShowLocalSuggestions] = useState(true);
+  const [showLocalSuggestions] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
@@ -273,9 +274,9 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-creamy-yellow-50 via-warm-green-50 to-terracotta-50">
+    <div className="min-h-screen bg-gradient-to-br from-creamy-yellow-50 via-warm-green-50 to-terracotta-50 pb-20 md:pb-0">
       {/* Enhanced Header with Authentication */}
-      <header className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200/50">
+      <header className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200/50 relative z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Bar */}
           <div className="flex items-center justify-between h-16">
@@ -299,7 +300,7 @@ function App() {
             <nav className="hidden lg:flex items-center gap-1" role="navigation" aria-label="Main navigation">
               <button
                 onClick={() => handleViewModeChange('discover')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-warm-green-500 focus:ring-offset-2 ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-warm-green-500 focus:ring-offset-2 min-h-[44px] ${
                   viewMode === 'discover'
                     ? 'bg-warm-green-500 text-white shadow-md'
                     : 'text-gray-700 hover:bg-gray-100'
@@ -311,7 +312,7 @@ function App() {
               </button>
               <button
                 onClick={() => handleViewModeChange('trending')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-terracotta-500 focus:ring-offset-2 ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-terracotta-500 focus:ring-offset-2 min-h-[44px] ${
                   viewMode === 'trending'
                     ? 'bg-terracotta-500 text-white shadow-md'
                     : 'text-gray-700 hover:bg-gray-100'
@@ -323,7 +324,7 @@ function App() {
               </button>
               <button
                 onClick={() => handleViewModeChange('ingredients')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-muted-blue-500 focus:ring-offset-2 ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-muted-blue-500 focus:ring-offset-2 min-h-[44px] ${
                   viewMode === 'ingredients'
                     ? 'bg-muted-blue-500 text-white shadow-md'
                     : 'text-gray-700 hover:bg-gray-100'
@@ -335,7 +336,7 @@ function App() {
               </button>
               <button
                 onClick={() => handleViewModeChange('community')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-light-lavender-500 focus:ring-offset-2 ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-light-lavender-500 focus:ring-offset-2 min-h-[44px] ${
                   viewMode === 'community'
                     ? 'bg-light-lavender-500 text-white shadow-md'
                     : 'text-gray-700 hover:bg-gray-100'
@@ -354,7 +355,7 @@ function App() {
                 <div className="hidden md:flex items-center gap-2">
                   <button
                     onClick={() => setShowMealPlan(true)}
-                    className="flex items-center gap-2 text-gray-700 hover:text-muted-blue-600 px-3 py-2 rounded-lg font-medium transition-colors"
+                    className="flex items-center gap-2 text-gray-700 hover:text-muted-blue-600 px-4 py-3 rounded-lg font-medium transition-colors min-h-[44px]"
                     title="Meal Planning"
                   >
                     <Calendar className="w-4 h-4" />
@@ -362,7 +363,7 @@ function App() {
                   </button>
                   <button
                     onClick={() => setShowShoppingList(true)}
-                    className="flex items-center gap-2 text-gray-700 hover:text-light-lavender-600 px-3 py-2 rounded-lg font-medium transition-colors"
+                    className="flex items-center gap-2 text-gray-700 hover:text-light-lavender-600 px-4 py-3 rounded-lg font-medium transition-colors min-h-[44px]"
                     title="Shopping Lists"
                   >
                     <ShoppingCart className="w-4 h-4" />
@@ -375,7 +376,7 @@ function App() {
               {user ? (
                 <button
                   onClick={() => setShowUserProfile(true)}
-                  className="flex items-center gap-2 bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-4 py-2 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all"
+                  className="flex items-center gap-2 bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-6 py-3 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all min-h-[44px]"
                 >
                   <User className="w-4 h-4" />
                   <span className="hidden sm:inline">Profile</span>
@@ -384,14 +385,14 @@ function App() {
                 <div className="hidden md:flex items-center gap-2">
                   <button
                     onClick={() => handleAuthClick('signin')}
-                    className="flex items-center gap-2 text-gray-700 hover:text-warm-green-600 px-3 py-2 rounded-lg font-medium transition-colors"
+                    className="flex items-center gap-2 text-gray-700 hover:text-warm-green-600 px-4 py-3 rounded-lg font-medium transition-colors min-h-[44px]"
                   >
                     <LogIn className="w-4 h-4" />
                     Sign In
                   </button>
                   <button
                     onClick={() => handleAuthClick('signup')}
-                    className="bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-4 py-2 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all"
+                    className="bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-6 py-3 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all min-h-[44px]"
                   >
                     Sign Up
                   </button>
@@ -400,7 +401,7 @@ function App() {
 
               {/* Location */}
               {location && (
-                <div className="hidden md:flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg">
+                <div className="hidden md:flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg">
                   <MapPin className="w-4 h-4 text-terracotta-500" />
                   <span className="text-sm font-medium text-gray-700">
                     {location.city}
@@ -411,7 +412,7 @@ function App() {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-warm-green-500"
+                className="lg:hidden p-3 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-warm-green-500 min-h-[44px] min-w-[44px]"
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-menu"
                 aria-label="Toggle navigation menu"
@@ -423,55 +424,55 @@ function App() {
 
           {/* Mobile Navigation */}
           {isMobileMenuOpen && (
-            <div id="mobile-menu" className="lg:hidden py-4 border-t border-gray-200">
-              <nav className="flex flex-col gap-2" role="navigation" aria-label="Mobile navigation">
+            <div id="mobile-menu" className="lg:hidden py-6 border-t border-gray-200">
+              <nav className="flex flex-col gap-3" role="navigation" aria-label="Mobile navigation">
                 <button
                   onClick={() => handleViewModeChange('discover')}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all text-left focus:outline-none focus:ring-2 focus:ring-warm-green-500 ${
+                  className={`flex items-center gap-4 px-6 py-4 rounded-xl font-medium transition-all text-left focus:outline-none focus:ring-2 focus:ring-warm-green-500 min-h-[52px] ${
                     viewMode === 'discover'
                       ? 'bg-warm-green-500 text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                   aria-current={viewMode === 'discover' ? 'page' : undefined}
                 >
-                  <Sparkles className="w-5 h-5" />
-                  Discover Recipes
+                  <Sparkles className="w-6 h-6" />
+                  <span className="text-lg">Discover Recipes</span>
                 </button>
                 <button
                   onClick={() => handleViewModeChange('trending')}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all text-left focus:outline-none focus:ring-2 focus:ring-terracotta-500 ${
+                  className={`flex items-center gap-4 px-6 py-4 rounded-xl font-medium transition-all text-left focus:outline-none focus:ring-2 focus:ring-terracotta-500 min-h-[52px] ${
                     viewMode === 'trending'
                       ? 'bg-terracotta-500 text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                   aria-current={viewMode === 'trending' ? 'page' : undefined}
                 >
-                  <TrendingUp className="w-5 h-5" />
-                  Trending Recipes
+                  <TrendingUp className="w-6 h-6" />
+                  <span className="text-lg">Trending Recipes</span>
                 </button>
                 <button
                   onClick={() => handleViewModeChange('ingredients')}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all text-left focus:outline-none focus:ring-2 focus:ring-muted-blue-500 ${
+                  className={`flex items-center gap-4 px-6 py-4 rounded-xl font-medium transition-all text-left focus:outline-none focus:ring-2 focus:ring-muted-blue-500 min-h-[52px] ${
                     viewMode === 'ingredients'
                       ? 'bg-muted-blue-500 text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                   aria-current={viewMode === 'ingredients' ? 'page' : undefined}
                 >
-                  <ChefHat className="w-5 h-5" />
-                  Find by Ingredients
+                  <ChefHat className="w-6 h-6" />
+                  <span className="text-lg">Find by Ingredients</span>
                 </button>
                 <button
                   onClick={() => handleViewModeChange('community')}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all text-left focus:outline-none focus:ring-2 focus:ring-light-lavender-500 ${
+                  className={`flex items-center gap-4 px-6 py-4 rounded-xl font-medium transition-all text-left focus:outline-none focus:ring-2 focus:ring-light-lavender-500 min-h-[52px] ${
                     viewMode === 'community'
                       ? 'bg-light-lavender-500 text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                   aria-current={viewMode === 'community' ? 'page' : undefined}
                 >
-                  <Users className="w-5 h-5" />
-                  Community Recipes
+                  <Users className="w-6 h-6" />
+                  <span className="text-lg">Community Recipes</span>
                 </button>
 
                 {/* Mobile User Tools */}
@@ -482,59 +483,121 @@ function App() {
                         setShowMealPlan(true);
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-all text-left"
+                      className="w-full flex items-center gap-4 px-6 py-4 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-all text-left min-h-[52px]"
                     >
-                      <Calendar className="w-5 h-5" />
-                      Meal Planning
+                      <Calendar className="w-6 h-6" />
+                      <span className="text-lg">Meal Planning</span>
                     </button>
                     <button
                       onClick={() => {
                         setShowShoppingList(true);
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-all text-left"
+                      className="w-full flex items-center gap-4 px-6 py-4 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-all text-left min-h-[52px]"
                     >
-                      <ShoppingCart className="w-5 h-5" />
-                      Shopping Lists
+                      <ShoppingCart className="w-6 h-6" />
+                      <span className="text-lg">Shopping Lists</span>
                     </button>
                   </div>
                 )}
 
                 {/* Mobile Auth */}
                 {!user && (
-                  <div className="pt-4 border-t border-gray-200 mt-4">
+                  <div className="pt-4 border-t border-gray-200 mt-4 space-y-3">
                     <button
-                      onClick={() => handleAuthClick('signin')}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-all text-left"
+                      onClick={() => {
+                        handleAuthClick('signin');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-4 px-6 py-4 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-all text-left min-h-[52px]"
                     >
-                      <LogIn className="w-5 h-5" />
-                      Sign In
+                      <LogIn className="w-6 h-6" />
+                      <span className="text-lg">Sign In</span>
                     </button>
                     <button
-                      onClick={() => handleAuthClick('signup')}
-                      className="w-full mt-2 bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-4 py-3 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all"
+                      onClick={() => {
+                        handleAuthClick('signup');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-6 py-4 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all min-h-[52px]"
                     >
-                      Sign Up
+                      <span className="text-lg">Sign Up</span>
                     </button>
                   </div>
                 )}
               </nav>
             </div>
           )}
-
-          {/* Search Section */}
-          {viewMode !== 'community' && (
-            <div className="py-6">
-              <SearchBar
-                onSearch={handleSearch}
-                onVoiceSearch={handleVoiceSearch}
-                location={location ? `${location.city}, ${location.country}` : undefined}
-                isListening={isListening}
-              />
-            </div>
-          )}
         </div>
       </header>
+
+      {/* Search Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {viewMode !== 'community' && (
+          <div className="py-6">
+            <SearchBar
+              onSearch={handleSearch}
+              onVoiceSearch={handleVoiceSearch}
+              location={location ? `${location.city}, ${location.country}` : undefined}
+              isListening={isListening}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 z-50">
+        <div className="grid grid-cols-4 gap-1">
+          <button
+            onClick={() => handleViewModeChange('discover')}
+            className={`flex flex-col items-center justify-center py-3 px-2 transition-all min-h-[60px] ${
+              viewMode === 'discover'
+                ? 'text-warm-green-600 bg-warm-green-50'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            }`}
+            aria-current={viewMode === 'discover' ? 'page' : undefined}
+          >
+            <Sparkles className="w-5 h-5 mb-1" />
+            <span className="text-xs font-medium">Discover</span>
+          </button>
+          <button
+            onClick={() => handleViewModeChange('trending')}
+            className={`flex flex-col items-center justify-center py-3 px-2 transition-all min-h-[60px] ${
+              viewMode === 'trending'
+                ? 'text-terracotta-600 bg-terracotta-50'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            }`}
+            aria-current={viewMode === 'trending' ? 'page' : undefined}
+          >
+            <TrendingUp className="w-5 h-5 mb-1" />
+            <span className="text-xs font-medium">Trending</span>
+          </button>
+          <button
+            onClick={() => handleViewModeChange('ingredients')}
+            className={`flex flex-col items-center justify-center py-3 px-2 transition-all min-h-[60px] ${
+              viewMode === 'ingredients'
+                ? 'text-muted-blue-600 bg-muted-blue-50'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            }`}
+            aria-current={viewMode === 'ingredients' ? 'page' : undefined}
+          >
+            <ChefHat className="w-5 h-5 mb-1" />
+            <span className="text-xs font-medium">Ingredients</span>
+          </button>
+          <button
+            onClick={() => handleViewModeChange('community')}
+            className={`flex flex-col items-center justify-center py-3 px-2 transition-all min-h-[60px] ${
+              viewMode === 'community'
+                ? 'text-light-lavender-600 bg-light-lavender-50'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            }`}
+            aria-current={viewMode === 'community' ? 'page' : undefined}
+          >
+            <Users className="w-5 h-5 mb-1" />
+            <span className="text-xs font-medium">Community</span>
+          </button>
+        </div>
+      </nav>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -758,6 +821,12 @@ function App() {
           </>
         )}
       </main>
+
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt 
+        onInstall={() => console.log('App installed successfully!')}
+        onDismiss={() => console.log('Install prompt dismissed')}
+      />
 
       {/* Enhanced Voice Assistant Button */}
       <VoiceButton
