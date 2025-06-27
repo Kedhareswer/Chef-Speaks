@@ -3,6 +3,7 @@ import { ShoppingCart, Plus, X, Check, Trash2, Calendar, ChefHat, AlertCircle } 
 import { useAuth } from '../hooks/useAuth';
 import { shoppingListService, ShoppingList, ShoppingListItem } from '../services/shoppingListService';
 import { mealPlanService } from '../services/mealPlanService';
+import { SkeletonBox } from './SkeletonLoaders';
 
 interface ShoppingListViewProps {
   isOpen: boolean;
@@ -317,9 +318,22 @@ export const ShoppingListView: React.FC<ShoppingListViewProps> = ({ isOpen, onCl
 
             {/* Lists */}
             {loading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-warm-green-500 mx-auto mb-2"></div>
-                <p className="text-soft-brown-600 text-sm">Loading lists...</p>
+              <div className="animate-pulse space-y-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="p-3 rounded-2xl bg-white/50 border border-soft-brown-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <SkeletonBox className="h-4 w-24 rounded" />
+                      <SkeletonBox className="w-4 h-4 rounded" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <SkeletonBox className="h-3 w-16 rounded" />
+                      <div className="flex items-center gap-2">
+                        <SkeletonBox className="w-16 h-2 rounded-full" />
+                        <SkeletonBox className="h-3 w-8 rounded" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="space-y-2">

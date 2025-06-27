@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Activity, Zap, Heart, Beef, Wheat, Droplets, AlertCircle } from 'lucide-react'
 import { spoonacularService, NutritionInfo as NutritionData } from '../services/spoonacularService'
+import { NutritionSkeleton } from './SkeletonLoaders'
 
 interface NutritionInfoProps {
   recipeId?: string
@@ -66,24 +67,7 @@ export const NutritionInfo: React.FC<NutritionInfoProps> = ({
   }
 
   if (loading) {
-    return (
-      <div className={`glass-organic rounded-3xl p-6 border border-warm-green-200/50 ${className}`}>
-        <div className="flex items-center gap-3 mb-4">
-          <Activity className="w-6 h-6 text-warm-green-500" />
-          <h3 className="text-lg font-semibold text-soft-brown-900">Nutrition Facts</h3>
-        </div>
-        <div className="animate-pulse space-y-3">
-          <div className="h-4 bg-soft-brown-200 rounded w-3/4"></div>
-          <div className="h-4 bg-soft-brown-200 rounded w-1/2"></div>
-          <div className="h-4 bg-soft-brown-200 rounded w-2/3"></div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-20 bg-soft-brown-200 rounded-2xl"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
+    return <NutritionSkeleton />;
   }
 
   if (error) {

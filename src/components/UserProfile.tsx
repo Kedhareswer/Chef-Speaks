@@ -8,6 +8,7 @@ import { recipeService } from '../services/recipeService'
 import { ProfileImageUpload } from './ProfileImageUpload'
 import { AVAILABLE_VOICES, elevenLabsService } from '../services/elevenLabsService'
 import { Recipe } from '../types'
+import { UserProfileSkeleton } from './SkeletonLoaders'
 
 interface UserProfileProps {
   isOpen: boolean
@@ -240,10 +241,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => 
 
         <div className="p-6 space-y-6">
           {loading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-warm-green-500 mx-auto"></div>
-              <p className="text-soft-brown-600 mt-2">{t('loadingProfile')}</p>
-            </div>
+            <UserProfileSkeleton />
           ) : (
             <>
               {/* Enhanced Stats Section */}

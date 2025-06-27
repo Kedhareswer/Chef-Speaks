@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { mealPlanService, MealPlan } from '../services/mealPlanService';
 import { recipeService } from '../services/recipeService';
 import { Recipe } from '../types';
+import { SkeletonBox } from './SkeletonLoaders';
 
 interface MealPlanCalendarProps {
   isOpen: boolean;
@@ -176,9 +177,31 @@ export const MealPlanCalendar: React.FC<MealPlanCalendarProps> = ({ isOpen, onCl
         {/* Calendar Grid */}
         <div className="p-6">
           {loading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-warm-green-500 mx-auto mb-4"></div>
-              <p className="text-soft-brown-600">Loading meal plans...</p>
+            <div className="animate-pulse">
+              <div className="grid grid-cols-7 gap-4 mb-4">
+                {/* Day Headers Skeleton */}
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                  <div key={day} className="text-center py-2">
+                    <SkeletonBox className="h-5 w-8 rounded mx-auto" />
+                  </div>
+                ))}
+              </div>
+              
+              <div className="grid grid-cols-7 gap-4">
+                {/* Day Cells Skeleton */}
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} className="min-h-[300px] p-3 rounded-3xl border-2 border-soft-brown-200 bg-white/50">
+                    <div className="text-center mb-3">
+                      <SkeletonBox className="h-6 w-6 rounded mx-auto" />
+                    </div>
+                    <div className="space-y-2">
+                      {[1, 2, 3, 4].map(j => (
+                        <SkeletonBox key={j} className="h-16 w-full rounded-2xl" />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-7 gap-4">

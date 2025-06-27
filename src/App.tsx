@@ -16,6 +16,7 @@ import { UserProfile } from './components/UserProfile';
 import { MealPlanCalendar } from './components/MealPlanCalendar';
 import { ShoppingListView } from './components/ShoppingListView';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { AppLoadingSkeleton, SearchResultsSkeleton } from './components/SkeletonLoaders';
 import { parseVoiceCommand, filterRecipesByVoiceCommand } from './utils/voiceCommands';
 import { recipeService } from './services/recipeService';
 import { checkAndSeedDatabase } from './data/seedData';
@@ -310,17 +311,7 @@ function App() {
 
   // Show loading screen while auth or app is loading
   if (loading || authLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-creamy-yellow-50 via-warm-green-50 to-terracotta-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-warm-green-500 mx-auto mb-6"></div>
-          <p className="text-gray-600 text-lg">Loading ChefSpeak...</p>
-          {authLoading && (
-            <p className="text-gray-500 text-sm mt-2">Setting up your profile...</p>
-          )}
-        </div>
-      </div>
-    );
+    return <AppLoadingSkeleton />;
   }
 
   // Show error screen if there's an error
@@ -802,15 +793,12 @@ function App() {
           </div>
         )}
 
-        {/* Loading state */}
+        {/* Location Loading */}
         {locationLoading && viewMode === 'discover' && (
-          <div className="text-center py-16">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-warm-green-500 mx-auto mb-6"></div>
-            <p className="text-gray-600 text-lg">Getting your location for personalized recipes...</p>
-          </div>
+          <SearchResultsSkeleton />
         )}
 
-        {/* Content based on view mode */}
+        {/* Recipe Results */}
         {viewMode === 'community' ? (
           <CommunityRecipes
             onRecipeSelect={handleRecipeSelect}

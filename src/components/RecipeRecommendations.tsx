@@ -5,6 +5,7 @@ import { Recipe } from '../types'
 import { RecipeCard } from './RecipeCard'
 import { useAuth } from '../hooks/useAuth'
 import { recommendationService } from '../services/recommendationService'
+import { RecipeGridSkeleton, SkeletonBox } from './SkeletonLoaders'
 
 interface RecipeRecommendationsProps {
   onRecipeSelect: (recipe: Recipe) => void
@@ -174,9 +175,12 @@ export const RecipeRecommendations: React.FC<RecipeRecommendationsProps> = ({
       {/* Content */}
       <div className="p-6">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading recommendations...</p>
+          <div className="animate-pulse">
+            {/* Tab Description Skeleton */}
+            <SkeletonBox className="h-4 w-3/4 rounded mb-6" />
+            
+            {/* Recipe Grid Skeleton */}
+            <RecipeGridSkeleton count={3} />
           </div>
         ) : currentRecommendations.length > 0 ? (
           <>
