@@ -103,7 +103,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
   };
 
   return (
-    <div className="group glass-organic backdrop-blur-organic rounded-3xl shadow-soft-xl overflow-hidden hover:shadow-soft-2xl transition-all duration-500 transform hover:-translate-y-3 border border-terracotta-200/30 card-organic-hover">
+    <div className="group card-recipe">
       {/* Recipe Image */}
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
@@ -134,7 +134,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
               {/* Share Button */}
               <button
                 onClick={handleShare}
-                className="p-3 rounded-2xl backdrop-blur-sm bg-white/20 text-white hover:bg-white/30 transition-all transform hover:scale-110 active:scale-95 min-h-[44px] min-w-[44px] shadow-lg"
+                className="btn-secondary btn-sm touch-target backdrop-blur-sm bg-white/20 text-white hover:bg-white/30"
                 title="Share recipe"
               >
                 <Share2 className="w-5 h-5" />
@@ -145,7 +145,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
                 <button
                   onClick={handleToggleFavorite}
                   disabled={isUpdatingFavorite}
-                  className={`p-3 rounded-2xl backdrop-blur-sm transition-all transform hover:scale-110 active:scale-95 min-h-[44px] min-w-[44px] shadow-lg ${
+                  className={`btn-sm touch-target backdrop-blur-sm ${
                     isFavorite 
                       ? 'bg-terracotta-500 text-white shadow-terracotta-500/30' 
                       : 'bg-white/20 text-white hover:bg-white/30'
@@ -185,8 +185,8 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
       </div>
 
       {/* Recipe Content */}
-      <div className="p-6 flex flex-col h-[320px]">
-        <div className="mb-4 flex-grow">
+      <div className="card-padding flex flex-col" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="mb-4">
           <h3 className="text-xl font-bold text-soft-brown-900 leading-tight mb-3 group-hover:text-warm-green-600 transition-colors line-clamp-2">
             {recipe.title}
           </h3>
@@ -228,7 +228,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
         </div>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-4">
           {recipe.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
@@ -245,12 +245,15 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
         </div>
 
         {/* Action Button */}
-        <button
-          onClick={() => onSelect(recipe)}
-          className="w-full bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 hover:from-warm-green-600 hover:via-terracotta-600 hover:to-soft-brown-600 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-warm-green-500/30 shadow-lg hover:shadow-xl min-h-[52px] mt-auto"
-        >
-          {recipe.videoUrl ? 'View Recipe & Watch Video' : 'View Recipe'}
-        </button>
+        <div className="mt-auto pt-4">
+          <button
+            onClick={() => onSelect(recipe)}
+            className="w-full btn-primary btn-lg"
+            style={{ zIndex: 1 }}
+          >
+            {recipe.videoUrl ? 'View Recipe & Watch Video' : 'View Recipe'}
+          </button>
+        </div>
       </div>
     </div>
   );

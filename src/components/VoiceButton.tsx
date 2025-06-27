@@ -37,13 +37,14 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
   };
 
   return (
-    <div className="fixed bottom-28 md:bottom-8 right-6 md:right-8 z-40">
+    <div className="voice-button-container">
       <div className="flex flex-col gap-5">
         {/* Stop Speaking Button */}
         {isSpeaking && (
           <button
             onClick={handleStopSpeaking}
-            className="bg-gradient-to-r from-muted-blue-500 to-light-lavender-500 hover:from-muted-blue-600 hover:to-light-lavender-600 text-white p-4 rounded-2xl shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 border-4 border-white/50 backdrop-blur-sm animate-organic-float min-h-[64px] min-w-[64px]"
+            className="bg-gradient-to-r from-muted-blue-500 to-light-lavender-500 hover:from-muted-blue-600 hover:to-light-lavender-600 text-white p-4 rounded-2xl shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 border-4 border-white/50 backdrop-blur-sm animate-organic-float touch-target-large"
+            style={{ minHeight: '4rem', minWidth: '4rem' }}
             aria-label={t('voiceButton.stopSpeaking', { defaultValue: 'Stop speaking' })}
           >
             <Volume2 className="w-8 h-8" />
@@ -56,13 +57,14 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
             onClick={handleVoiceToggle}
             disabled={disabled}
             className={`
-              relative p-6 rounded-2xl shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 border-4 border-white/50 backdrop-blur-sm min-h-[80px] min-w-[80px]
+              relative p-6 rounded-2xl shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 border-4 border-white/50 backdrop-blur-sm touch-target-large
               ${isListening 
                 ? 'bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 hover:from-terracotta-600 hover:to-dusty-pink-600 text-white animate-soft-pulse' 
                 : 'bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 hover:from-warm-green-600 hover:via-terracotta-600 hover:to-soft-brown-600 text-white animate-warm-glow'
               }
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
+            style={{ minHeight: '5rem', minWidth: '5rem' }}
             aria-label={isListening ? t('voiceButton.stopListening', { defaultValue: 'Stop listening' }) : t('voiceButton.startVoiceCommand', { defaultValue: 'Start voice command' })}
           >
             {isListening ? (

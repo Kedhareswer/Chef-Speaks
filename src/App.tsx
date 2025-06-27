@@ -368,12 +368,12 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-creamy-yellow-50 via-warm-green-50 to-terracotta-50 pb-20 md:pb-0">
+    <div className="min-h-screen bg-gradient-to-br from-creamy-yellow-50 via-warm-green-50 to-terracotta-50 content-with-bottom-nav lg:pb-0">
       {/* Enhanced Header with Authentication */}
-      <header className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200/50 relative z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="glass-strong shadow-lg border-b border-gray-200/50 relative z-40">
+        <div className="container-responsive">
           {/* Top Bar */}
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between header-height lg:header-height">
             {/* Logo and Brand */}
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -394,10 +394,10 @@ function App() {
             <nav className="hidden lg:flex items-center gap-1" role="navigation" aria-label="Main navigation">
               <button
                 onClick={() => handleViewModeChange('discover')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-warm-green-500 focus:ring-offset-2 min-h-[44px] ${
+                className={`nav-item-desktop ${
                   viewMode === 'discover'
-                    ? 'bg-warm-green-500 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-warm-green-500 text-white shadow-md focus:ring-warm-green-500'
+                    : 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
                 }`}
                 aria-current={viewMode === 'discover' ? 'page' : undefined}
               >
@@ -406,10 +406,10 @@ function App() {
               </button>
               <button
                 onClick={() => handleViewModeChange('trending')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-terracotta-500 focus:ring-offset-2 min-h-[44px] ${
+                className={`nav-item-desktop ${
                   viewMode === 'trending'
-                    ? 'bg-terracotta-500 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-terracotta-500 text-white shadow-md focus:ring-terracotta-500'
+                    : 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
                 }`}
                 aria-current={viewMode === 'trending' ? 'page' : undefined}
               >
@@ -418,10 +418,10 @@ function App() {
               </button>
               <button
                 onClick={() => handleViewModeChange('ingredients')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-muted-blue-500 focus:ring-offset-2 min-h-[44px] ${
+                className={`nav-item-desktop ${
                   viewMode === 'ingredients'
-                    ? 'bg-muted-blue-500 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-muted-blue-500 text-white shadow-md focus:ring-muted-blue-500'
+                    : 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
                 }`}
                 aria-current={viewMode === 'ingredients' ? 'page' : undefined}
               >
@@ -430,10 +430,10 @@ function App() {
               </button>
               <button
                 onClick={() => handleViewModeChange('community')}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all focus:outline-none focus:ring-2 focus:ring-light-lavender-500 focus:ring-offset-2 min-h-[44px] ${
+                className={`nav-item-desktop ${
                   viewMode === 'community'
-                    ? 'bg-light-lavender-500 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-light-lavender-500 text-white shadow-md focus:ring-light-lavender-500'
+                    : 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
                 }`}
                 aria-current={viewMode === 'community' ? 'page' : undefined}
               >
@@ -470,7 +470,7 @@ function App() {
               {user ? (
                 <button
                   onClick={() => setShowUserProfile(true)}
-                  className="flex items-center gap-2 bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-6 py-3 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all min-h-[44px]"
+                  className="btn-primary btn-md"
                 >
                   <User className="w-4 h-4" />
                   <span className="hidden sm:inline">{t('profile')}</span>
@@ -479,14 +479,14 @@ function App() {
                 <div className="hidden md:flex items-center gap-2">
                   <button
                     onClick={() => handleAuthClick('signin')}
-                    className="flex items-center gap-2 text-gray-700 hover:text-warm-green-600 px-4 py-3 rounded-lg font-medium transition-colors min-h-[44px]"
+                    className="btn-ghost btn-md"
                   >
                     <LogIn className="w-4 h-4" />
                     {t('signIn')}
                   </button>
                   <button
                     onClick={() => handleAuthClick('signup')}
-                    className="bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white px-6 py-3 rounded-xl font-medium hover:from-warm-green-600 hover:to-terracotta-600 transition-all min-h-[44px]"
+                    className="btn-primary btn-md"
                   >
                     {t('signUp')}
                   </button>
@@ -506,7 +506,7 @@ function App() {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-3 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-warm-green-500 min-h-[44px] min-w-[44px]"
+                className="lg:hidden btn-ghost btn-sm touch-target"
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-menu"
                 aria-label="Toggle navigation menu"
@@ -518,14 +518,14 @@ function App() {
 
           {/* Mobile Navigation */}
           {isMobileMenuOpen && (
-            <div id="mobile-menu" className="lg:hidden py-6 border-t border-gray-200">
+            <div id="mobile-menu" className="lg:hidden section-padding border-t border-gray-200">
               <nav className="flex flex-col gap-3" role="navigation" aria-label="Mobile navigation">
                 <button
                   onClick={() => handleViewModeChange('discover')}
-                  className={`flex items-center gap-4 px-6 py-4 rounded-xl font-medium transition-all text-left focus:outline-none focus:ring-2 focus:ring-warm-green-500 min-h-[52px] ${
+                  className={`nav-item-mobile ${
                     viewMode === 'discover'
-                      ? 'bg-warm-green-500 text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-warm-green-500 text-white focus:ring-warm-green-500'
+                      : 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
                   }`}
                   aria-current={viewMode === 'discover' ? 'page' : undefined}
                 >
@@ -623,9 +623,9 @@ function App() {
       </header>
 
       {/* Search Section */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container-responsive">
         {viewMode !== 'community' && (
-          <div className="py-8">
+          <div className="section-padding">
             <SearchBar
               onSearch={handleSearch}
               onVoiceSearch={handleVoiceSearch}
@@ -637,11 +637,11 @@ function App() {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 z-50 safe-area-bottom">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 glass-strong border-t border-gray-200 z-50 bottom-nav-height">
         <div className="grid grid-cols-4 gap-1 px-2">
           <button
             onClick={() => handleViewModeChange('discover')}
-            className={`flex flex-col items-center justify-center py-4 px-3 transition-all min-h-[68px] rounded-xl mx-1 my-2 ${
+            className={`nav-item-bottom mx-1 my-2 ${
               viewMode === 'discover'
                 ? 'text-warm-green-600 bg-warm-green-50 shadow-sm border border-warm-green-200'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -653,7 +653,7 @@ function App() {
           </button>
           <button
             onClick={() => handleViewModeChange('trending')}
-            className={`flex flex-col items-center justify-center py-4 px-3 transition-all min-h-[68px] rounded-xl mx-1 my-2 ${
+            className={`nav-item-bottom mx-1 my-2 ${
               viewMode === 'trending'
                 ? 'text-terracotta-600 bg-terracotta-50 shadow-sm border border-terracotta-200'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -665,7 +665,7 @@ function App() {
           </button>
           <button
             onClick={() => handleViewModeChange('ingredients')}
-            className={`flex flex-col items-center justify-center py-4 px-3 transition-all min-h-[68px] rounded-xl mx-1 my-2 ${
+            className={`nav-item-bottom mx-1 my-2 ${
               viewMode === 'ingredients'
                 ? 'text-muted-blue-600 bg-muted-blue-50 shadow-sm border border-muted-blue-200'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -677,7 +677,7 @@ function App() {
           </button>
           <button
             onClick={() => handleViewModeChange('community')}
-            className={`flex flex-col items-center justify-center py-4 px-3 transition-all min-h-[68px] rounded-xl mx-1 my-2 ${
+            className={`nav-item-bottom mx-1 my-2 ${
               viewMode === 'community'
                 ? 'text-light-lavender-600 bg-light-lavender-50 shadow-sm border border-light-lavender-200'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -691,7 +691,7 @@ function App() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-8">
+      <main className="container-responsive section-padding">
         {/* Voice Status */}
         {transcript && (
           <div className="bg-white rounded-3xl p-8 mb-10 shadow-xl border border-gray-200/50 backdrop-blur-sm">

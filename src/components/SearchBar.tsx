@@ -56,7 +56,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   }, []);
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className="search-container">
       <form onSubmit={handleSubmit} className="relative">
         <div className="relative group">
           <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-soft-brown-400 w-6 h-6 group-focus-within:text-warm-green-500 transition-colors pointer-events-none" />
@@ -68,7 +68,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder={placeholder || t('searchPlaceholder')}
-            className="w-full pl-16 pr-24 py-5 text-lg glass-organic backdrop-blur-organic rounded-[2rem] shadow-soft-xl border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-warm-green-500/20 focus:border-warm-green-500 transition-all placeholder-soft-brown-400 min-h-[64px] font-medium"
+            className="search-input font-medium"
             autoComplete="off"
             autoCapitalize="off"
             autoCorrect="off"
@@ -81,7 +81,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               <button
                 type="button"
                 onClick={handleClear}
-                className="p-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-all duration-200 min-h-[44px] min-w-[44px] shadow-sm"
+                className="btn-secondary btn-sm touch-target"
                 aria-label={t('searchBar.clearSearch', { defaultValue: 'Clear search' })}
               >
                 <X className="w-5 h-5" />
@@ -92,13 +92,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             <button
               type="button"
               onClick={handleVoiceClick}
-              className={`
-                p-3 rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg min-h-[48px] min-w-[48px]
-                ${isListening 
-                  ? 'bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 text-white animate-soft-pulse shadow-terracotta-500/30' 
-                  : 'bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 hover:from-warm-green-600 hover:via-terracotta-600 hover:to-soft-brown-600 text-white shadow-warm-green-500/30'
-                }
-              `}
+              className={`search-button touch-target ${isListening ? 'animate-pulse' : ''}`}
               aria-label={t('searchBar.voiceSearch', { defaultValue: 'Voice search' })}
             >
               {isListening ? (

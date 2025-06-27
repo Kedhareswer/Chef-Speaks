@@ -54,7 +54,7 @@ export const CommunityRecipes: React.FC<CommunityRecipesProps> = ({
           </div>
           <button
             onClick={() => setShowAddForm(true)}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-6 py-3 rounded-3xl font-medium transition-all duration-200 flex items-center gap-2"
+            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white btn-md flex items-center gap-2 touch-target"
           >
             <Plus className="w-5 h-5" />
             Add Recipe
@@ -111,15 +111,15 @@ export const CommunityRecipes: React.FC<CommunityRecipesProps> = ({
 
       {/* Recipes Grid */}
       {communityRecipes.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {communityRecipes.map((recipe) => (
             <div key={recipe.id} className="relative">
               <RecipeCard
                 recipe={recipe}
                 onSelect={onRecipeSelect}
               />
-              {/* Community Badge */}
-              <div className="absolute top-4 left-4 bg-light-lavender-500 text-white px-2 py-1 rounded-pill text-xs font-medium flex items-center gap-1">
+              {/* Community Badge - positioned to not interfere with card */}
+              <div className="absolute top-3 left-3 bg-light-lavender-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg backdrop-blur-sm" style={{ zIndex: 20 }}>
                 <Users className="w-3 h-3" />
                 Community
               </div>
@@ -133,7 +133,7 @@ export const CommunityRecipes: React.FC<CommunityRecipesProps> = ({
           <p className="text-soft-brown-500 mb-6">Be the first to share your favorite recipe with the community!</p>
           <button
             onClick={() => setShowAddForm(true)}
-            className="btn-organic btn-organic-primary"
+            className="btn-primary btn-lg"
           >
             Share Your First Recipe
           </button>
