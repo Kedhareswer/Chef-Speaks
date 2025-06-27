@@ -462,15 +462,6 @@ npm run lint
 | **Vercel** | 🔶 Ready | - | Edge functions |
 | **Supabase** | 🔶 Ready | - | Full-stack |
 
-### Environment Variables
-```bash
-# Production
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_ELEVEN_LABS_API_KEY=your-api-key
-VITE_SPOONACULAR_API_KEY=your-api-key
-```
-
 ---
 
 ## 🤝 Contributing
@@ -529,33 +520,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Issues**: [GitHub Issues](https://github.com/your-username/chefspeak/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/your-username/chefspeak/discussions)
 - **Email**: support@chefspeak.com
-
-### Community
-- **Discord**: [Join our community](https://discord.gg/chefspeak)
-- **Twitter**: [@ChefSpeakApp](https://twitter.com/ChefSpeakApp)
-- **Blog**: [chefspeak.com/blog](https://chefspeak.com/blog)
-
----
-
-## 🎯 Roadmap
-
-### Q1 2025
-- [ ] Mobile app (React Native)
-- [ ] Offline recipe storage
-- [ ] Advanced meal planning
-- [ ] Social features expansion
-
-### Q2 2025
-- [ ] AI recipe generation
-- [ ] Video recipe integration
-- [ ] Smart kitchen device integration
-- [ ] Advanced nutrition tracking
-
-### Q3 2025
-- [ ] Marketplace for recipes
-- [ ] Professional chef features
-- [ ] Restaurant integration
-- [ ] Advanced analytics
 
 ---
 
