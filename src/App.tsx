@@ -623,9 +623,9 @@ function App() {
       </header>
 
       {/* Search Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {viewMode !== 'community' && (
-          <div className="py-6">
+          <div className="py-8">
             <SearchBar
               onSearch={handleSearch}
               onVoiceSearch={handleVoiceSearch}
@@ -637,71 +637,71 @@ function App() {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 z-50">
-        <div className="grid grid-cols-4 gap-1">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 z-50 safe-area-bottom">
+        <div className="grid grid-cols-4 gap-1 px-2">
           <button
             onClick={() => handleViewModeChange('discover')}
-            className={`flex flex-col items-center justify-center py-3 px-2 transition-all min-h-[60px] ${
+            className={`flex flex-col items-center justify-center py-4 px-3 transition-all min-h-[68px] rounded-xl mx-1 my-2 ${
               viewMode === 'discover'
-                ? 'text-warm-green-600 bg-warm-green-50'
+                ? 'text-warm-green-600 bg-warm-green-50 shadow-sm border border-warm-green-200'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
             aria-current={viewMode === 'discover' ? 'page' : undefined}
           >
-            <Sparkles className="w-5 h-5 mb-1" />
+            <Sparkles className="w-5 h-5 mb-1.5" />
             <span className="text-xs font-medium">Discover</span>
           </button>
           <button
             onClick={() => handleViewModeChange('trending')}
-            className={`flex flex-col items-center justify-center py-3 px-2 transition-all min-h-[60px] ${
+            className={`flex flex-col items-center justify-center py-4 px-3 transition-all min-h-[68px] rounded-xl mx-1 my-2 ${
               viewMode === 'trending'
-                ? 'text-terracotta-600 bg-terracotta-50'
+                ? 'text-terracotta-600 bg-terracotta-50 shadow-sm border border-terracotta-200'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
             aria-current={viewMode === 'trending' ? 'page' : undefined}
           >
-            <TrendingUp className="w-5 h-5 mb-1" />
+            <TrendingUp className="w-5 h-5 mb-1.5" />
             <span className="text-xs font-medium">Trending</span>
           </button>
           <button
             onClick={() => handleViewModeChange('ingredients')}
-            className={`flex flex-col items-center justify-center py-3 px-2 transition-all min-h-[60px] ${
+            className={`flex flex-col items-center justify-center py-4 px-3 transition-all min-h-[68px] rounded-xl mx-1 my-2 ${
               viewMode === 'ingredients'
-                ? 'text-muted-blue-600 bg-muted-blue-50'
+                ? 'text-muted-blue-600 bg-muted-blue-50 shadow-sm border border-muted-blue-200'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
             aria-current={viewMode === 'ingredients' ? 'page' : undefined}
           >
-            <ChefHat className="w-5 h-5 mb-1" />
+            <ChefHat className="w-5 h-5 mb-1.5" />
             <span className="text-xs font-medium">Ingredients</span>
           </button>
           <button
             onClick={() => handleViewModeChange('community')}
-            className={`flex flex-col items-center justify-center py-3 px-2 transition-all min-h-[60px] ${
+            className={`flex flex-col items-center justify-center py-4 px-3 transition-all min-h-[68px] rounded-xl mx-1 my-2 ${
               viewMode === 'community'
-                ? 'text-light-lavender-600 bg-light-lavender-50'
+                ? 'text-light-lavender-600 bg-light-lavender-50 shadow-sm border border-light-lavender-200'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
             aria-current={viewMode === 'community' ? 'page' : undefined}
           >
-            <Users className="w-5 h-5 mb-1" />
+            <Users className="w-5 h-5 mb-1.5" />
             <span className="text-xs font-medium">Community</span>
           </button>
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-8">
         {/* Voice Status */}
         {transcript && (
-          <div className="bg-white rounded-2xl p-6 mb-8 shadow-lg border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-r from-warm-green-500 to-terracotta-500 p-3 rounded-xl">
-                <Sparkles className="w-6 h-6 text-white" />
+          <div className="bg-white rounded-3xl p-8 mb-10 shadow-xl border border-gray-200/50 backdrop-blur-sm">
+            <div className="flex items-center gap-6">
+              <div className="bg-gradient-to-r from-warm-green-500 to-terracotta-500 p-4 rounded-2xl shadow-lg">
+                <Sparkles className="w-7 h-7 text-white" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600 font-medium">Voice Command Recognized:</p>
-                <p className="text-lg font-semibold text-gray-900">"{transcript}"</p>
+              <div className="flex-1">
+                <p className="text-sm text-gray-600 font-semibold mb-2 uppercase tracking-wide">Voice Command Recognized</p>
+                <p className="text-xl font-bold text-gray-900 leading-relaxed">"{transcript}"</p>
               </div>
             </div>
           </div>
@@ -709,110 +709,110 @@ function App() {
 
         {/* Enhanced Hero Section for Discover Mode */}
         {viewMode === 'discover' && !searchQuery && (
-          <div className="mb-12">
-            <div className="bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 rounded-3xl p-8 lg:p-12 text-white mb-8 relative overflow-hidden shadow-xl">
+          <div className="mb-16">
+            <div className="bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 rounded-[2rem] p-8 lg:p-16 text-white mb-12 relative overflow-hidden shadow-2xl">
               <div className="relative z-10 max-w-4xl">
-                <h2 className="text-4xl lg:text-5xl font-bold mb-4">
+                <h2 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
                   Discover Culinary Magic
                 </h2>
-                <p className="text-xl text-white/95 mb-8 leading-relaxed max-w-3xl">
+                <p className="text-xl lg:text-2xl text-white/95 mb-10 leading-relaxed max-w-3xl">
                   Explore {allRecipes.length}+ organic recipes from around the world with AI-powered voice assistance, 
                   personalized recommendations, and step-by-step guidance.
                 </p>
-                <div className="flex flex-wrap gap-3">
-                  <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
-                    <span className="font-semibold">{allRecipes.length}+ Recipes</span>
+                <div className="flex flex-wrap gap-4">
+                  <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/30">
+                    <span className="font-bold text-lg">{allRecipes.length}+ Recipes</span>
                   </div>
-                  <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
-                    <span className="font-semibold">AI Voice Assistant</span>
+                  <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/30">
+                    <span className="font-bold text-lg">AI Voice Assistant</span>
                   </div>
-                  <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
-                    <span className="font-semibold">{getCuisineStats().length} Cuisines</span>
+                  <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/30">
+                    <span className="font-bold text-lg">{getCuisineStats().length} Cuisines</span>
                   </div>
-                  <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
-                    <span className="font-semibold">Video Tutorials</span>
+                  <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/30">
+                    <span className="font-bold text-lg">Video Tutorials</span>
                   </div>
                   {user && (
-                    <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
-                      <span className="font-semibold">Personal Profile</span>
+                    <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/30">
+                      <span className="font-bold text-lg">Personal Profile</span>
                     </div>
                   )}
                 </div>
               </div>
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-24 -translate-x-24"></div>
+              <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -translate-y-40 translate-x-40"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full translate-y-32 -translate-x-32"></div>
             </div>
 
             {/* Enhanced Quick Access Cards */}
-            <div className="grid lg:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-gradient-to-r from-warm-green-500 to-muted-blue-500 p-3 rounded-xl">
-                    <Clock className="w-6 h-6 text-white" />
+            <div className="grid lg:grid-cols-3 gap-8 mb-12">
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-gradient-to-r from-warm-green-500 to-muted-blue-500 p-4 rounded-2xl shadow-lg">
+                    <Clock className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">Quick & Easy</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">Quick & Easy</h3>
                 </div>
-                <p className="text-gray-600 mb-4">Ready in 30 minutes or less</p>
-                <div className="grid grid-cols-2 gap-3">
+                <p className="text-gray-600 mb-6 text-lg">Ready in 30 minutes or less</p>
+                <div className="grid grid-cols-1 gap-4">
                   {getQuickRecipes().map((recipe) => (
                     <button
                       key={recipe.id}
                       onClick={() => handleRecipeSelect(recipe)}
-                      className="text-left p-3 bg-warm-green-50 rounded-xl hover:bg-warm-green-100 transition-colors border border-warm-green-200 focus:outline-none focus:ring-2 focus:ring-warm-green-500"
+                      className="text-left p-4 bg-warm-green-50 rounded-2xl hover:bg-warm-green-100 transition-all duration-200 border border-warm-green-200 focus:outline-none focus:ring-4 focus:ring-warm-green-500/30 hover:shadow-lg min-h-[64px]"
                     >
-                      <div className="font-medium text-sm text-gray-900 truncate">{recipe.title}</div>
-                      <div className="text-xs text-warm-green-600 flex items-center gap-1">
-                        <Flame className="w-3 h-3" />
-                        {recipe.cookTime}m
+                      <div className="font-semibold text-gray-900 mb-1">{recipe.title}</div>
+                      <div className="text-sm text-warm-green-600 flex items-center gap-2">
+                        <Flame className="w-4 h-4" />
+                        {recipe.cookTime} minutes
                       </div>
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 p-3 rounded-xl">
-                    <Star className="w-6 h-6 text-white" />
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 p-4 rounded-2xl shadow-lg">
+                    <Star className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">Top Rated</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">Top Rated</h3>
                 </div>
-                <p className="text-gray-600 mb-4">Highest rated by our community</p>
-                <div className="grid grid-cols-2 gap-3">
+                <p className="text-gray-600 mb-6 text-lg">Highest rated by our community</p>
+                <div className="grid grid-cols-1 gap-4">
                   {getTrendingRecipes().slice(0, 4).map((recipe) => (
                     <button
                       key={recipe.id}
                       onClick={() => handleRecipeSelect(recipe)}
-                      className="text-left p-3 bg-terracotta-50 rounded-xl hover:bg-terracotta-100 transition-colors border border-terracotta-200 focus:outline-none focus:ring-2 focus:ring-terracotta-500"
+                      className="text-left p-4 bg-terracotta-50 rounded-2xl hover:bg-terracotta-100 transition-all duration-200 border border-terracotta-200 focus:outline-none focus:ring-4 focus:ring-terracotta-500/30 hover:shadow-lg min-h-[64px]"
                     >
-                      <div className="font-medium text-sm text-gray-900 truncate">{recipe.title}</div>
-                      <div className="flex items-center gap-1 text-xs text-terracotta-600">
-                        <Star className="w-3 h-3 fill-current text-creamy-yellow-400" />
-                        {recipe.rating}
+                      <div className="font-semibold text-gray-900 mb-1">{recipe.title}</div>
+                      <div className="flex items-center gap-2 text-sm text-terracotta-600">
+                        <Star className="w-4 h-4 fill-current text-creamy-yellow-400" />
+                        {recipe.rating} rating
                       </div>
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-gradient-to-r from-muted-blue-500 to-light-lavender-500 p-3 rounded-xl">
-                    <Globe className="w-6 h-6 text-white" />
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-gradient-to-r from-muted-blue-500 to-light-lavender-500 p-4 rounded-2xl shadow-lg">
+                    <Globe className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">Global Cuisines</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">Global Cuisines</h3>
                 </div>
-                <p className="text-gray-600 mb-4">Explore flavors from around the world</p>
-                <div className="space-y-2">
+                <p className="text-gray-600 mb-6 text-lg">Explore flavors from around the world</p>
+                <div className="space-y-3">
                   {getCuisineStats().slice(0, 4).map(([cuisine, count]) => (
                     <button
                       key={cuisine}
                       onClick={() => handleSearch(cuisine)}
-                      className="w-full text-left p-2 bg-muted-blue-50 rounded-xl hover:bg-muted-blue-100 transition-colors border border-muted-blue-200 focus:outline-none focus:ring-2 focus:ring-muted-blue-500"
+                      className="w-full text-left p-4 bg-muted-blue-50 rounded-2xl hover:bg-muted-blue-100 transition-all duration-200 border border-muted-blue-200 focus:outline-none focus:ring-4 focus:ring-muted-blue-500/30 hover:shadow-lg min-h-[64px]"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-sm text-gray-900">{cuisine}</span>
-                        <span className="text-xs text-muted-blue-600 bg-muted-blue-200 px-2 py-1 rounded-full">{count}</span>
+                        <span className="font-semibold text-gray-900 text-lg">{cuisine}</span>
+                        <span className="text-sm text-muted-blue-600 bg-muted-blue-200 px-3 py-1.5 rounded-xl font-medium">{count}</span>
                       </div>
                     </button>
                   ))}
@@ -838,17 +838,19 @@ function App() {
           <>
             {/* Ingredient Selector */}
             {viewMode === 'ingredients' && (
-              <IngredientSelector
-                onRecipesFound={setFilteredRecipes}
-                allRecipes={allRecipes}
-                showLocalSuggestions={showLocalSuggestions}
-                location={location ? `${location.city}, ${location.country}` : undefined}
-              />
+              <div className="mb-12">
+                <IngredientSelector
+                  onRecipesFound={setFilteredRecipes}
+                  allRecipes={allRecipes}
+                  showLocalSuggestions={showLocalSuggestions}
+                  location={location ? `${location.city}, ${location.country}` : undefined}
+                />
+              </div>
             )}
 
             {/* Results Header */}
-            <div className="mb-8">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+            <div className="mb-12">
+              <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
                 {viewMode === 'trending' 
                   ? 'Trending Recipes'
                   : viewMode === 'ingredients' 
@@ -860,12 +862,12 @@ function App() {
                         : 'Discover Amazing Recipes'
                 }
               </h2>
-              <div className="flex items-center gap-4 text-gray-600">
-                <span className="text-lg font-medium">
+              <div className="flex items-center gap-6 text-gray-600">
+                <span className="text-xl font-semibold">
                   {filteredRecipes.length} recipe{filteredRecipes.length !== 1 ? 's' : ''} found
                 </span>
                 {viewMode === 'trending' && (
-                  <span className="bg-gradient-to-r from-terracotta-100 to-dusty-pink-100 text-terracotta-700 px-3 py-1 rounded-full text-sm font-medium border border-terracotta-200">
+                  <span className="bg-gradient-to-r from-terracotta-100 to-dusty-pink-100 text-terracotta-700 px-4 py-2 rounded-2xl text-base font-bold border border-terracotta-200">
                     Highly Rated
                   </span>
                 )}
@@ -874,7 +876,7 @@ function App() {
 
             {/* Recipe Grid */}
             {filteredRecipes.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {filteredRecipes.map((recipe) => (
                   <RecipeCard
                     key={recipe.id}
@@ -884,11 +886,11 @@ function App() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20">
-                <div className="bg-white rounded-3xl p-12 shadow-lg max-w-md mx-auto border border-gray-200">
-                  <ChefHat className="w-20 h-20 text-gray-400 mx-auto mb-6" />
-                  <h3 className="text-2xl font-bold text-gray-600 mb-4">No recipes found</h3>
-                  <p className="text-gray-500 mb-8 leading-relaxed">
+              <div className="text-center py-24">
+                <div className="bg-white/80 backdrop-blur-sm rounded-[2rem] p-16 shadow-2xl max-w-lg mx-auto border border-gray-200/50">
+                  <ChefHat className="w-24 h-24 text-gray-400 mx-auto mb-8" />
+                  <h3 className="text-3xl font-bold text-gray-600 mb-6">No recipes found</h3>
+                  <p className="text-gray-500 mb-10 leading-relaxed text-lg">
                     {viewMode === 'ingredients' 
                       ? 'Try selecting different ingredients or add more to find matching recipes'
                       : 'Try searching for something else or use voice commands'
@@ -899,7 +901,7 @@ function App() {
                       setSearchQuery('');
                       setFilteredRecipes(allRecipes);
                     }}
-                    className="bg-gradient-to-r from-warm-green-500 to-terracotta-500 hover:from-warm-green-600 hover:to-terracotta-600 text-white font-semibold py-3 px-6 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-warm-green-500 focus:ring-offset-2"
+                    className="bg-gradient-to-r from-warm-green-500 to-terracotta-500 hover:from-warm-green-600 hover:to-terracotta-600 text-white font-bold py-4 px-8 rounded-2xl transition-all focus:outline-none focus:ring-4 focus:ring-warm-green-500/30 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                   >
                     Show All Recipes
                   </button>

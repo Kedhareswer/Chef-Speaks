@@ -56,10 +56,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   }, []);
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-5xl mx-auto">
       <form onSubmit={handleSubmit} className="relative">
         <div className="relative group">
-          <Search className="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 text-soft-brown-400 w-5 h-5 md:w-6 md:h-6 group-focus-within:text-warm-green-500 transition-colors pointer-events-none" />
+          <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-soft-brown-400 w-6 h-6 group-focus-within:text-warm-green-500 transition-colors pointer-events-none" />
           <input
             ref={inputRef}
             type="text"
@@ -68,23 +68,23 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder={placeholder || t('searchPlaceholder')}
-            className="w-full pl-12 md:pl-16 pr-20 md:pr-32 py-4 md:py-5 text-base md:text-lg glass-organic backdrop-blur-organic rounded-3xl md:rounded-4xl shadow-soft-xl border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-warm-green-500/20 focus:border-warm-green-500 transition-all placeholder-soft-brown-400 min-h-[56px]"
+            className="w-full pl-16 pr-24 py-5 text-lg glass-organic backdrop-blur-organic rounded-[2rem] shadow-soft-xl border-2 border-transparent focus:outline-none focus:ring-4 focus:ring-warm-green-500/20 focus:border-warm-green-500 transition-all placeholder-soft-brown-400 min-h-[64px] font-medium"
             autoComplete="off"
             autoCapitalize="off"
             autoCorrect="off"
             spellCheck="false"
           />
           
-          <div className="absolute right-2 md:right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1 md:gap-2">
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
             {/* Clear button */}
             {query && (
               <button
                 type="button"
                 onClick={handleClear}
-                className="p-2 md:p-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-all duration-200 min-h-[40px] min-w-[40px]"
+                className="p-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-all duration-200 min-h-[44px] min-w-[44px] shadow-sm"
                 aria-label={t('searchBar.clearSearch', { defaultValue: 'Clear search' })}
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             )}
             
@@ -93,21 +93,21 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               type="button"
               onClick={handleVoiceClick}
               className={`
-                p-2.5 md:p-3 rounded-2xl md:rounded-3xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-soft-lg min-h-[44px] min-w-[44px] md:min-h-[48px] md:min-w-[48px]
+                p-3 rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg min-h-[48px] min-w-[48px]
                 ${isListening 
-                  ? 'bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 text-white animate-soft-pulse shadow-warm' 
-                  : 'bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 hover:from-warm-green-600 hover:via-terracotta-600 hover:to-soft-brown-600 text-white shadow-green'
+                  ? 'bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 text-white animate-soft-pulse shadow-terracotta-500/30' 
+                  : 'bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 hover:from-warm-green-600 hover:via-terracotta-600 hover:to-soft-brown-600 text-white shadow-warm-green-500/30'
                 }
               `}
               aria-label={t('searchBar.voiceSearch', { defaultValue: 'Voice search' })}
             >
               {isListening ? (
                 <div className="relative">
-                  <Mic className="w-5 h-5 md:w-6 md:h-6" />
-                  <div className="absolute inset-0 rounded-2xl md:rounded-3xl border-2 border-white animate-ping opacity-75"></div>
+                  <Mic className="w-6 h-6" />
+                  <div className="absolute inset-0 rounded-2xl border-2 border-white animate-ping opacity-75"></div>
                 </div>
               ) : (
-                <Mic className="w-5 h-5 md:w-6 md:h-6" />
+                <Mic className="w-6 h-6" />
               )}
             </button>
           </div>
@@ -115,35 +115,35 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       </form>
 
       {/* Enhanced location and suggestions */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-4 gap-3 md:gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-6 gap-4">
         {location && (
-          <div className="flex items-center gap-2 text-sm text-soft-brown-600 bg-creamy-yellow-50/80 backdrop-blur-sm px-3 md:px-4 py-2 rounded-2xl md:rounded-3xl border border-creamy-yellow-200/50 shadow-soft">
-            <MapPin className="w-4 h-4 text-terracotta-500 flex-shrink-0" />
-            <span className="truncate">{t('searchBar.recipesNear', { location, defaultValue: `Recipes near ${location}` })}</span>
+          <div className="flex items-center gap-3 text-sm text-soft-brown-600 bg-creamy-yellow-50/80 backdrop-blur-sm px-4 py-3 rounded-2xl border border-creamy-yellow-200/50 shadow-sm">
+            <MapPin className="w-5 h-5 text-terracotta-500 flex-shrink-0" />
+            <span className="truncate font-medium">{t('searchBar.recipesNear', { location, defaultValue: `Recipes near ${location}` })}</span>
           </div>
         )}
         
-        <div className="flex items-center gap-2 text-xs md:text-sm text-soft-brown-500">
-          <Zap className="w-4 h-4 text-warm-green-500 flex-shrink-0" />
-          <span className="truncate">{t('searchBar.tryExamples', { defaultValue: 'Try: "Italian pasta", "Quick dinner", or "Vegetarian"' })}</span>
+        <div className="flex items-center gap-3 text-sm text-soft-brown-500">
+          <Zap className="w-5 h-5 text-warm-green-500 flex-shrink-0" />
+          <span className="truncate font-medium">{t('searchBar.tryExamples', { defaultValue: 'Try: "Italian pasta", "Quick dinner", or "Vegetarian"' })}</span>
         </div>
       </div>
 
       {/* Enhanced voice status indicator */}
       {isListening && (
-        <div className="mt-4 flex items-center justify-center">
-          <div className="bg-gradient-to-r from-terracotta-500 via-dusty-pink-500 to-warm-green-500 text-white px-6 md:px-8 py-4 rounded-3xl md:rounded-4xl shadow-soft-2xl border border-white/20 max-w-full">
-            <div className="flex items-center gap-3 md:gap-4">
-              <div className="flex gap-1">
-                <div className="w-1 h-4 md:h-6 organic-wave"></div>
-                <div className="w-1 h-3 md:h-4 organic-wave"></div>
-                <div className="w-1 h-5 md:h-7 organic-wave"></div>
-                <div className="w-1 h-4 md:h-5 organic-wave"></div>
-                <div className="w-1 h-4 md:h-6 organic-wave"></div>
+        <div className="mt-6 flex items-center justify-center">
+          <div className="bg-gradient-to-r from-terracotta-500 via-dusty-pink-500 to-warm-green-500 text-white px-8 py-5 rounded-[2rem] shadow-2xl border border-white/20 max-w-full backdrop-blur-sm">
+            <div className="flex items-center gap-5">
+              <div className="flex gap-1.5">
+                <div className="w-1.5 h-6 organic-wave"></div>
+                <div className="w-1.5 h-4 organic-wave"></div>
+                <div className="w-1.5 h-8 organic-wave"></div>
+                <div className="w-1.5 h-5 organic-wave"></div>
+                <div className="w-1.5 h-7 organic-wave"></div>
               </div>
               <div>
-                <div className="font-semibold text-base md:text-lg">{t('listening')}</div>
-                <div className="text-sm text-white/80">{t('speakYourRequest')}</div>
+                <div className="font-bold text-xl">{t('listening')}</div>
+                <div className="text-sm text-white/90 font-medium">{t('speakYourRequest')}</div>
               </div>
             </div>
           </div>
@@ -152,12 +152,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
       {/* Quick Search Suggestions (Mobile) */}
       {isFocused && !query && (
-        <div className="mt-4 md:hidden">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-700">{t('searchBar.popularSearches', { defaultValue: 'Popular Searches' })}</h3>
+        <div className="mt-6 md:hidden">
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-700">{t('searchBar.popularSearches', { defaultValue: 'Popular Searches' })}</h3>
             </div>
-            <div className="p-2">
+            <div className="p-4">
               {[
                 t('searchBar.suggestion1', { defaultValue: 'Italian pasta' }),
                 t('searchBar.suggestion2', { defaultValue: 'Quick breakfast' }),
@@ -172,9 +172,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     setQuery(suggestion);
                     onSearch(suggestion);
                   }}
-                  className="w-full text-left px-3 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-3 min-h-[44px]"
+                  className="w-full text-left px-4 py-4 text-base text-gray-700 hover:bg-gray-50 rounded-2xl transition-colors flex items-center gap-4 min-h-[56px] font-medium"
                 >
-                  <Search className="w-4 h-4 text-gray-400" />
+                  <Search className="w-5 h-5 text-gray-400" />
                   {suggestion}
                 </button>
               ))}

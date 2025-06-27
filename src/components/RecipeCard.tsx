@@ -103,41 +103,41 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
   };
 
   return (
-    <div className="group glass-organic backdrop-blur-organic rounded-3xl md:rounded-5xl shadow-soft-xl overflow-hidden hover:shadow-soft-2xl transition-all duration-500 transform hover:-translate-y-2 border border-terracotta-200/30 card-organic-hover">
+    <div className="group glass-organic backdrop-blur-organic rounded-3xl shadow-soft-xl overflow-hidden hover:shadow-soft-2xl transition-all duration-500 transform hover:-translate-y-3 border border-terracotta-200/30 card-organic-hover">
       {/* Recipe Image */}
-      <div className="relative h-48 md:h-56 overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden">
         <img
           src={recipe.imageUrl}
           alt={recipe.title}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
         {/* Top badges */}
-        <div className="absolute top-3 md:top-4 left-3 md:left-4 right-3 md:right-4 flex justify-between items-start">
-          <div className="flex flex-col gap-2">
-            <span className={`px-2.5 md:px-3 py-1 rounded-pill text-xs md:text-sm font-semibold border backdrop-blur-sm ${getDifficultyColor(recipe.difficulty)}`}>
+        <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+          <div className="flex flex-col gap-2.5">
+            <span className={`px-3 py-1.5 rounded-2xl text-sm font-bold border backdrop-blur-sm ${getDifficultyColor(recipe.difficulty)}`}>
               {recipe.difficulty}
             </span>
             {recipe.rating && recipe.rating >= 4.5 && (
-              <div className="bg-gradient-to-r from-creamy-yellow-400 to-terracotta-400 text-white px-2 py-1 rounded-pill text-xs font-bold flex items-center gap-1 backdrop-blur-sm">
-                <Star className="w-3 h-3 fill-current" />
+              <div className="bg-gradient-to-r from-creamy-yellow-400 to-terracotta-400 text-white px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm shadow-lg">
+                <Star className="w-3.5 h-3.5 fill-current" />
                 Top Rated
               </div>
             )}
           </div>
           
-          <div className="flex flex-col gap-2 items-end">
+          <div className="flex flex-col gap-2.5 items-end">
             {/* Action Buttons */}
-            <div className="flex gap-2">
+            <div className="flex gap-2.5">
               {/* Share Button */}
               <button
                 onClick={handleShare}
-                className="p-2 md:p-2.5 rounded-full backdrop-blur-sm bg-white/20 text-white hover:bg-white/30 transition-all transform hover:scale-110 active:scale-95 min-h-[40px] min-w-[40px]"
+                className="p-3 rounded-2xl backdrop-blur-sm bg-white/20 text-white hover:bg-white/30 transition-all transform hover:scale-110 active:scale-95 min-h-[44px] min-w-[44px] shadow-lg"
                 title="Share recipe"
               >
-                <Share2 className="w-4 h-4" />
+                <Share2 className="w-5 h-5" />
               </button>
 
               {/* Favorite Button */}
@@ -145,29 +145,29 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
                 <button
                   onClick={handleToggleFavorite}
                   disabled={isUpdatingFavorite}
-                  className={`p-2 md:p-2.5 rounded-full backdrop-blur-sm transition-all transform hover:scale-110 active:scale-95 min-h-[40px] min-w-[40px] ${
+                  className={`p-3 rounded-2xl backdrop-blur-sm transition-all transform hover:scale-110 active:scale-95 min-h-[44px] min-w-[44px] shadow-lg ${
                     isFavorite 
-                      ? 'bg-terracotta-500 text-white' 
+                      ? 'bg-terracotta-500 text-white shadow-terracotta-500/30' 
                       : 'bg-white/20 text-white hover:bg-white/30'
                   } ${isUpdatingFavorite ? 'opacity-50 cursor-not-allowed' : ''}`}
                   title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                 >
-                  <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+                  <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
                 </button>
               )}
             </div>
             
             {/* Recipe Type Badges */}
-            <div className="flex flex-col gap-1 items-end">
+            <div className="flex flex-col gap-2 items-end">
               {recipe.videoUrl && (
-                <div className="bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 text-white px-2.5 py-1 rounded-pill text-xs font-semibold flex items-center gap-1 backdrop-blur-sm">
-                  <Play className="w-3 h-3 fill-current" />
+                <div className="bg-gradient-to-r from-terracotta-500 to-dusty-pink-500 text-white px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm shadow-lg">
+                  <Play className="w-3.5 h-3.5 fill-current" />
                   Video
                 </div>
               )}
               {recipe.cookTime <= 30 && (
-                <div className="bg-gradient-to-r from-warm-green-500 to-muted-blue-500 text-white px-2 py-1 rounded-pill text-xs font-bold flex items-center gap-1 backdrop-blur-sm">
-                  <Flame className="w-3 h-3" />
+                <div className="bg-gradient-to-r from-warm-green-500 to-muted-blue-500 text-white px-3 py-1.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 backdrop-blur-sm shadow-lg">
+                  <Flame className="w-3.5 h-3.5" />
                   Quick
                 </div>
               )}
@@ -176,18 +176,18 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
         </div>
 
         {/* Cuisine badge */}
-        <div className="absolute bottom-3 md:bottom-4 left-3 md:left-4">
-          <span className="bg-creamy-yellow-50/90 backdrop-blur-sm text-soft-brown-800 px-2.5 md:px-3 py-1 rounded-pill text-xs md:text-sm font-semibold border border-creamy-yellow-200/50 flex items-center gap-1">
-            <Globe className="w-3 h-3" />
+        <div className="absolute bottom-4 left-4">
+          <span className="bg-creamy-yellow-50/95 backdrop-blur-sm text-soft-brown-800 px-3 py-1.5 rounded-2xl text-sm font-bold border border-creamy-yellow-200/70 flex items-center gap-1.5 shadow-lg">
+            <Globe className="w-4 h-4" />
             {recipe.cuisine}
           </span>
         </div>
       </div>
 
       {/* Recipe Content */}
-      <div className="p-4 md:p-6">
-        <div className="mb-4">
-          <h3 className="text-lg md:text-xl font-bold text-soft-brown-900 leading-tight mb-2 group-hover:text-warm-green-600 transition-colors">
+      <div className="p-6 flex flex-col h-[320px]">
+        <div className="mb-4 flex-grow">
+          <h3 className="text-xl font-bold text-soft-brown-900 leading-tight mb-3 group-hover:text-warm-green-600 transition-colors line-clamp-2">
             {recipe.title}
           </h3>
           <p className="text-soft-brown-600 text-sm leading-relaxed line-clamp-2">{recipe.description}</p>
@@ -195,7 +195,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
 
         {/* Rating */}
         {recipe.rating && (
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-3 mb-5">
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
@@ -206,39 +206,39 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
                 />
               ))}
             </div>
-            <span className="text-sm font-semibold text-soft-brown-700">{recipe.rating}</span>
+            <span className="text-sm font-bold text-soft-brown-700">{recipe.rating}</span>
             <span className="text-xs text-soft-brown-500">({recipe.totalRatings} reviews)</span>
           </div>
         )}
 
         {/* Recipe Stats */}
-        <div className="grid grid-cols-3 gap-2 md:gap-3 mb-4">
-          <div className={`text-center p-2.5 md:p-3 rounded-2xl md:rounded-3xl border ${getCookTimeColor(recipe.cookTime)}`}>
-            <Clock className="w-4 h-4 mx-auto mb-1" />
-            <div className="text-xs font-semibold">{recipe.cookTime}m</div>
+        <div className="grid grid-cols-3 gap-3 mb-5">
+          <div className={`text-center p-3 rounded-2xl border ${getCookTimeColor(recipe.cookTime)}`}>
+            <Clock className="w-5 h-5 mx-auto mb-1.5" />
+            <div className="text-xs font-bold">{recipe.cookTime}m</div>
           </div>
-          <div className="text-center p-2.5 md:p-3 rounded-2xl md:rounded-3xl bg-muted-blue-50 text-muted-blue-600 border border-muted-blue-200">
-            <Users className="w-4 h-4 mx-auto mb-1" />
-            <div className="text-xs font-semibold">{recipe.servings}</div>
+          <div className="text-center p-3 rounded-2xl bg-muted-blue-50 text-muted-blue-600 border border-muted-blue-200">
+            <Users className="w-5 h-5 mx-auto mb-1.5" />
+            <div className="text-xs font-bold">{recipe.servings}</div>
           </div>
-          <div className="text-center p-2.5 md:p-3 rounded-2xl md:rounded-3xl bg-light-lavender-50 text-light-lavender-600 border border-light-lavender-200">
-            <ChefHat className="w-4 h-4 mx-auto mb-1" />
-            <div className="text-xs font-semibold">{recipe.ingredients.length}</div>
+          <div className="text-center p-3 rounded-2xl bg-light-lavender-50 text-light-lavender-600 border border-light-lavender-200">
+            <ChefHat className="w-5 h-5 mx-auto mb-1.5" />
+            <div className="text-xs font-bold">{recipe.ingredients.length}</div>
           </div>
         </div>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-5">
+        <div className="flex flex-wrap gap-2 mb-6">
           {recipe.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="text-xs bg-soft-brown-100 text-soft-brown-600 px-2 py-1 rounded-pill font-medium border border-soft-brown-200"
+              className="text-xs bg-soft-brown-100 text-soft-brown-600 px-2.5 py-1 rounded-xl font-semibold border border-soft-brown-200"
             >
               #{tag}
             </span>
           ))}
           {recipe.tags.length > 3 && (
-            <span className="text-xs text-soft-brown-400 px-2 py-1">
+            <span className="text-xs text-soft-brown-400 px-2.5 py-1 font-medium">
               +{recipe.tags.length - 3} more
             </span>
           )}
@@ -247,7 +247,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onSelect }) => {
         {/* Action Button */}
         <button
           onClick={() => onSelect(recipe)}
-          className="w-full bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 hover:from-warm-green-600 hover:via-terracotta-600 hover:to-soft-brown-600 text-white font-semibold py-4 px-6 rounded-3xl md:rounded-4xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-warm-green-500/30 shadow-soft-lg hover:shadow-soft-xl min-h-[52px]"
+          className="w-full bg-gradient-to-r from-warm-green-500 via-terracotta-500 to-soft-brown-500 hover:from-warm-green-600 hover:via-terracotta-600 hover:to-soft-brown-600 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-warm-green-500/30 shadow-lg hover:shadow-xl min-h-[52px] mt-auto"
         >
           {recipe.videoUrl ? 'View Recipe & Watch Video' : 'View Recipe'}
         </button>
