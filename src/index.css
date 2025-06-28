@@ -460,13 +460,13 @@
 }
 
 .search-input {
-  @apply input-base w-full pr-24 pl-6 py-4 text-lg bg-white/90 backdrop-blur-sm;
+  @apply input-base w-full pr-24 pl-16 py-4 text-lg bg-white/90 backdrop-blur-sm;
   border-radius: var(--radius-2xl);
   min-height: 3.5rem; /* 56px */
 }
 
 .search-button {
-  @apply absolute right-2 top-1/2 transform -translate-y-1/2 touch-target bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white;
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2 touch-target bg-gradient-to-r from-warm-green-500 to-terracotta-500 text-white;
   border-radius: var(--radius-xl);
 }
 
@@ -536,5 +536,35 @@
 }
 
 .glass-strong {
-  @apply bg-white/90 backdrop-blur-lg border border-white/30 shadow-xl;
+  @apply bg-white/95 backdrop-blur-lg border border-white/30 shadow-xl;
+}
+
+/* Desktop-specific enhancements */
+@media (min-width: 1024px) {
+  /* Increased section spacing for desktop */
+  .section-padding {
+    @apply py-8 lg:py-16;
+  }
+  
+  /* Enhanced card hover effects for desktop */
+  .card-recipe {
+    @apply hover:shadow-2xl hover:-translate-y-2;
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+  }
+  
+  /* Refined button hover states */
+  .btn-primary {
+    @apply hover:shadow-lg;
+  }
+  
+  /* Larger content container for desktop */
+  .container-responsive {
+    max-width: 1280px;
+  }
+  
+  /* Improved desktop navigation */
+  .nav-item-desktop {
+    @apply px-8 py-3;
+    letter-spacing: 0.01em;
+  }
 }
