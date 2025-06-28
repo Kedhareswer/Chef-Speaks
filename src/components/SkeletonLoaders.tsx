@@ -219,6 +219,83 @@ export const RecipeDetailSkeleton: React.FC = () => (
   </SkeletonBase>
 );
 
+// User Profile Skeleton
+export const UserProfileSkeleton: React.FC = () => (
+  <SkeletonBase>
+    <div className="space-y-6">
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="text-center p-4 bg-white/50 rounded-3xl border border-gray-200">
+            <SkeletonBox className="w-8 h-8 mx-auto mb-2 rounded" />
+            <SkeletonBox className="h-6 w-12 mx-auto mb-1 rounded" />
+            <SkeletonBox className="h-4 w-20 mx-auto rounded" />
+          </div>
+        ))}
+      </div>
+
+      {/* Basic Information Section */}
+      <div className="space-y-4">
+        <SkeletonBox className="h-6 w-40 rounded" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <SkeletonBox className="h-4 w-20 rounded mb-2" />
+            <SkeletonBox className="h-6 w-32 rounded" />
+          </div>
+          <div>
+            <SkeletonBox className="h-4 w-24 rounded mb-2" />
+            <SkeletonBox className="h-6 w-28 rounded" />
+          </div>
+        </div>
+        <div>
+          <SkeletonBox className="h-4 w-32 rounded mb-2" />
+          <SkeletonBox className="h-6 w-24 rounded" />
+        </div>
+      </div>
+
+      {/* Voice Settings Section */}
+      <div className="space-y-4">
+        <SkeletonBox className="h-6 w-48 rounded" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <SkeletonBox className="h-4 w-28 rounded mb-2" />
+            <SkeletonBox className="h-6 w-20 rounded" />
+          </div>
+          <div>
+            <SkeletonBox className="h-4 w-24 rounded mb-2" />
+            <SkeletonBox className="h-6 w-32 rounded" />
+          </div>
+        </div>
+        <div>
+          <SkeletonBox className="h-4 w-20 rounded mb-2" />
+          <SkeletonBox className="h-6 w-16 rounded" />
+        </div>
+      </div>
+
+      {/* Dietary Preferences Section */}
+      <div className="space-y-4">
+        <SkeletonBox className="h-6 w-36 rounded" />
+        <div>
+          <SkeletonBox className="h-4 w-32 rounded mb-2" />
+          <div className="flex flex-wrap gap-2">
+            {[1, 2, 3, 4].map(i => (
+              <SkeletonBox key={i} className="h-6 w-20 rounded-full" />
+            ))}
+          </div>
+        </div>
+        <div>
+          <SkeletonBox className="h-4 w-28 rounded mb-2" />
+          <div className="flex flex-wrap gap-2">
+            {[1, 2, 3, 4, 5].map(i => (
+              <SkeletonBox key={i} className="h-6 w-16 rounded-full" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </SkeletonBase>
+);
+
 // Nutrition Info Skeleton
 export const NutritionSkeleton: React.FC = () => (
   <SkeletonBase>
@@ -280,6 +357,7 @@ export default {
   RecipeCardSkeleton,
   RecipeGridSkeleton,
   RecipeDetailSkeleton,
+  UserProfileSkeleton,
   NutritionSkeleton,
   SearchResultsSkeleton,
   SkeletonBase,
