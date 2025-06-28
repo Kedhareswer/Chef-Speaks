@@ -371,6 +371,10 @@
   @apply card-interactive overflow-hidden;
 }
 
+.card-padding {
+  @apply p-6 sm:p-8;
+}
+
 /* Consistent Button Styles */
 .btn-base {
   @apply font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
@@ -444,10 +448,6 @@
 /* Consistent Spacing Classes */
 .section-padding {
   @apply py-6 sm:py-8 lg:py-12;
-}
-
-.card-padding {
-  @apply p-6 sm:p-8;
 }
 
 .content-padding {
@@ -537,6 +537,27 @@
 
 .glass-strong {
   @apply bg-white/95 backdrop-blur-lg border border-white/30 shadow-xl;
+}
+
+/* Shadow Styles */
+.shadow-soft {
+  box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-soft-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+}
+
+.shadow-soft-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.06), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-soft-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-green {
+  box-shadow: 0 4px 20px rgba(58, 159, 58, 0.15);
 }
 
 /* Desktop-specific enhancements */
