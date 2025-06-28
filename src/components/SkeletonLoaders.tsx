@@ -491,4 +491,4 @@ export default {
   SkeletonBox,
   SkeletonText,
   SkeletonAvatar
-}; 
+};
